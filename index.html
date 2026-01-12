@@ -1,423 +1,871 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Premium Pomodoro Timer</title>
-<style>
-:root {
-    --primary-color: rgba(255, 255, 255, 0.15);
-    --secondary-color: rgba(255, 255, 255, 0.05);
-    --accent-color: #ff6b6b;
-    --text-color: #ffffff;
-    --bg-color: #0f0f0f;
-    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --transition-speed: 0.3s;
-    --blur-strength: 20px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        :root {
+            --color-primary: #ff6b6b;
+            --color-secondary: #4ecdc4;
+            --color-accent: #ffd93d;
+            --color-dark: #0a0e27;
+            --color-darker: #050812;
+            --color-surface: rgba(255, 255, 255, 0.05);
+            --color-surface-light: rgba(255, 255, 255, 0.08);
+            --color-text: #ffffff;
+            --color-text-muted: #b0b3c1;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
+            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    font-family: var(--font-family);
-    background: var(--bg-color);
-    color: var(--text-color);
-    overflow-x: hidden;
-}
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-darker) 100%);
+            color: var(--color-text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            overflow: hidden;
+        }
 
-button {
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: inherit;
-    font: inherit;
-}
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
 
-input, select {
-    font: inherit;
-    color: inherit;
-    background: none;
-    border: none;
-    outline: none;
-}
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-a {
-    text-decoration: none;
-    color: inherit;
-}
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-}
+        .card {
+            background: var(--color-surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-.app-container {
-    backdrop-filter: blur(var(--blur-strength));
-    background: var(--primary-color);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px var(--secondary-color);
-    padding: 40px;
-    max-width: 400px;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all var(--transition-speed) ease;
-}
+        .card:hover {
+            background: var(--color-surface-light);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
 
-.timer-display {
-    font-size: 4rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    user-select: none;
-}
+        .timer-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-.session-type {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-    color: var(--accent-color);
-}
+        .timer-mode {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
 
-.controls {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-}
+        .timer-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            animation: pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.1), inset 0 0 30px rgba(78, 205, 196, 0.05);
+        }
 
-button.control-btn {
-    padding: 12px 20px;
-    border-radius: 12px;
-    background: var(--accent-color);
-    color: var(--text-color);
-    font-weight: bold;
-    transition: background var(--transition-speed);
-}
-
-button.control-btn:hover {
-    background: #ff5252;
-}
-
-.settings-panel {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
-}
-
-.settings-panel input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border-radius: 10px;
-    background: var(--secondary-color);
-    text-align: center;
-}
-
-input:focus, button:focus {
-    outline: 2px solid rgba(255,255,255,0.12);
-    outline-offset: 2px;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-    100% { transform: scale(1); opacity: 1; }
-}
-
-button.control-btn:active {
-    animation: pulse 0.2s ease-in-out;
-}
-
-.fade-in {
-    opacity: 0;
-    animation: fadeIn 0.5s forwards;
-}
-
-@keyframes fadeIn {
-    to { opacity: 1; }
-}
-
-body.fullscreen-mode {
-    background: #000;
-}
-
-body.fullscreen-mode .app-container {
-    max-width: 100%;
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    justify-content: center;
-}
-
-</style>
-</head>
-<body>
-<div class="app-container fade-in">
-    <div class="session-type" id="session-type">Pomodoro</div>
-    <div class="timer-display" id="timer-display" role="status" aria-live="polite">25:00</div>
-    <div class="controls">
-        <button class="control-btn" id="start-btn" aria-label="Start timer">Start</button>
-        <button class="control-btn" id="pause-btn" aria-label="Pause timer">Pause</button>
-        <button class="control-btn" id="reset-btn" aria-label="Reset timer">Reset</button>
-    </div>
-    <div class="settings-panel">
-        <label>Pomodoro (minutes):
-            <input type="number" id="pomodoro-duration" min="1" max="420" value="25" aria-label="Pomodoro duration in minutes">
-        </label>
-        <label>Short Break (minutes):
-            <input type="number" id="short-break-duration" min="1" max="60" value="5" aria-label="Short break duration in minutes">
-        </label>
-        <label>Long Break (minutes):
-            <input type="number" id="long-break-duration" min="1" max="60" value="15" aria-label="Long break duration in minutes">
-        </label>
-        <label>Sessions before Long Break:
-            <input type="number" id="sessions-before-long-break" min="1" max="10" value="4" aria-label="Sessions before a long break">
-        </label>
-        <label>Volume:
-            <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5" aria-label="Background music volume">
-        </label>
-        <label>
-            <input type="checkbox" id="mute-toggle" aria-label="Mute background audio"> Mute
-        </label>
-    </div>
-</div>
-<script>
-/* Load persisted settings (defensive parsing) */
-let storedPomodoro = parseInt(localStorage.getItem('pomodoroDuration'));
-let storedShortBreak = parseInt(localStorage.getItem('shortBreakDuration'));
-let storedLongBreak = parseInt(localStorage.getItem('longBreakDuration'));
-let storedSessionsBeforeLong = parseInt(localStorage.getItem('sessionsBeforeLongBreak'));
-let storedVolume = parseFloat(localStorage.getItem('volume'));
-let storedMuted = (localStorage.getItem('muted') === 'true');
-
-let pomodoroDuration = Number.isInteger(storedPomodoro) ? storedPomodoro : 25;
-let shortBreakDuration = Number.isInteger(storedShortBreak) ? storedShortBreak : 5;
-let longBreakDuration = Number.isInteger(storedLongBreak) ? storedLongBreak : 15;
-let sessionsBeforeLongBreak = Number.isInteger(storedSessionsBeforeLong) ? storedSessionsBeforeLong : 4;
-
-let sessionType = 'Pomodoro';
-let sessionCount = 0;
-let timer = null;
-let remainingTime = pomodoroDuration * 60;
-
-const timerDisplay = document.getElementById('timer-display');
-const sessionTypeDisplay = document.getElementById('session-type');
-
-function formatTime(seconds) {
-    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    return `${mins}:${secs}`;
-}
-
-function updateDisplay() {
-    timerDisplay.textContent = formatTime(remainingTime);
-    sessionTypeDisplay.textContent = sessionType;
-}
-
-function startTimer() {
-    if (!timer) {
-        timer = setInterval(() => {
-            if (remainingTime > 0) {
-                remainingTime--;
-                updateDisplay();
-            } else {
-                clearInterval(timer);
-                timer = null;
-                handleSessionEnd();
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 107, 107, 0.1), inset 0 0 30px rgba(78, 205, 196, 0.05);
             }
-        }, 1000);
-    }
-}
-
-function pauseTimer() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
-    }
-}
-
-function resetTimer() {
-    pauseTimer();
-    if (sessionType === 'Pomodoro') {
-        remainingTime = pomodoroDuration * 60;
-    } else if (sessionType === 'Short Break') {
-        remainingTime = shortBreakDuration * 60;
-    } else {
-        remainingTime = longBreakDuration * 60;
-    }
-    updateDisplay();
-}
-
-/* Audio elements */
-const alarmAudio = new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3');
-alarmAudio.loop = false;
-
-const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-bgMusic.loop = true;
-
-/* DOM elements */
-const startBtn = document.getElementById('start-btn');
-const pauseBtn = document.getElementById('pause-btn');
-const resetBtn = document.getElementById('reset-btn');
-
-const pomodoroInput = document.getElementById('pomodoro-duration');
-const shortBreakInput = document.getElementById('short-break-duration');
-const longBreakInput = document.getElementById('long-break-duration');
-const sessionsInput = document.getElementById('sessions-before-long-break');
-
-const volumeControl = document.getElementById('volume-control');
-const muteToggle = document.getElementById('mute-toggle');
-
-/* Initialize inputs from stored values so UI matches persisted settings */
-pomodoroInput.value = pomodoroDuration;
-shortBreakInput.value = shortBreakDuration;
-longBreakInput.value = longBreakDuration;
-sessionsInput.value = sessionsBeforeLongBreak;
-
-/* Initialize volume/mute from storage */
-if (!Number.isFinite(storedVolume)) {
-    storedVolume = parseFloat(volumeControl.value) || 0.5;
-}
-bgMusic.volume = Math.min(1, Math.max(0, storedVolume));
-volumeControl.value = bgMusic.volume;
-
-bgMusic.muted = !!storedMuted;
-muteToggle.checked = !!storedMuted;
-
-/* Try to start background music (many browsers may block autoplay) */
-bgMusic.play().catch(()=>{/* Autoplay blocked; it's fine */});
-
-/* Event listeners for controls */
-startBtn.addEventListener('click', startTimer);
-pauseBtn.addEventListener('click', pauseTimer);
-resetBtn.addEventListener('click', resetTimer);
-
-/* Persist changes when user updates settings and adjust timer if needed */
-pomodoroInput.addEventListener('change', () => {
-    const val = Math.max(1, Math.min(420, parseInt(pomodoroInput.value) || 25));
-    pomodoroDuration = val;
-    localStorage.setItem('pomodoroDuration', pomodoroDuration);
-    pomodoroInput.value = pomodoroDuration;
-    if (sessionType === 'Pomodoro') resetTimer();
-});
-
-shortBreakInput.addEventListener('change', () => {
-    const val = Math.max(1, Math.min(60, parseInt(shortBreakInput.value) || 5));
-    shortBreakDuration = val;
-    localStorage.setItem('shortBreakDuration', shortBreakDuration);
-    shortBreakInput.value = shortBreakDuration;
-    if (sessionType === 'Short Break') resetTimer();
-});
-
-longBreakInput.addEventListener('change', () => {
-    const val = Math.max(1, Math.min(60, parseInt(longBreakInput.value) || 15));
-    longBreakDuration = val;
-    localStorage.setItem('longBreakDuration', longBreakDuration);
-    longBreakInput.value = longBreakDuration;
-    if (sessionType === 'Long Break') resetTimer();
-});
-
-sessionsInput.addEventListener('change', () => {
-    const val = Math.max(1, Math.min(10, parseInt(sessionsInput.value) || 4));
-    sessionsBeforeLongBreak = val;
-    localStorage.setItem('sessionsBeforeLongBreak', sessionsBeforeLongBreak);
-    sessionsInput.value = sessionsBeforeLongBreak;
-});
-
-/* Volume and mute */
-volumeControl.addEventListener('input', () => {
-    const vol = Math.min(1, Math.max(0, parseFloat(volumeControl.value) || 0));
-    bgMusic.volume = vol;
-    localStorage.setItem('volume', vol);
-});
-
-muteToggle.addEventListener('change', () => {
-    bgMusic.muted = muteToggle.checked;
-    localStorage.setItem('muted', bgMusic.muted ? 'true' : 'false');
-});
-
-/* Stats */
-let streak = parseInt(localStorage.getItem('streak')) || 0;
-let dailyFocus = parseInt(localStorage.getItem('dailyFocus')) || 0;
-
-function updateStats() {
-    localStorage.setItem('streak', streak);
-    localStorage.setItem('dailyFocus', dailyFocus);
-}
-
-/* Consolidated session end handler (single implementation) */
-function handleSessionEnd() {
-    if (sessionType === 'Pomodoro') {
-        sessionCount++;
-        // Keep dailyFocus in minutes
-        dailyFocus += pomodoroDuration;
-        streak++;
-        if (sessionCount % sessionsBeforeLongBreak === 0) {
-            sessionType = 'Long Break';
-            remainingTime = longBreakDuration * 60;
-        } else {
-            sessionType = 'Short Break';
-            remainingTime = shortBreakDuration * 60;
+            50% {
+                box-shadow: 0 0 50px rgba(255, 107, 107, 0.2), inset 0 0 50px rgba(78, 205, 196, 0.1);
+            }
         }
-    } else {
-        sessionType = 'Pomodoro';
-        remainingTime = pomodoroDuration * 60;
-    }
 
-    updateStats();
-    updateDisplay();
-
-    // Play alarm (safe play)
-    try {
-        alarmAudio.currentTime = 0;
-        alarmAudio.play().catch(()=>{});
-    } catch (e) { /* ignore play errors */ }
-
-    // Automatically resume next session
-    startTimer();
-}
-
-/* Keyboard shortcut: space toggles start/pause */
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-        // If an input or button is focused, don't intercept
-        const active = document.activeElement;
-        const isInput = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
-        if (isInput) return;
-        e.preventDefault();
-        if (timer) {
-            pauseTimer();
-        } else {
-            startTimer();
+        .timer-value {
+            font-size: 56px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-    }
-});
 
-/* Update document title to show remaining time while running */
-function updatePageTitle() {
-    if (timer) {
-        document.title = `${formatTime(remainingTime)} - ${sessionType}`;
-    } else {
-        document.title = `Pomodoro Timer`;
-    }
-}
-updatePageTitle();
-setInterval(updatePageTitle, 1000);
+        .timer-value.break {
+            background: linear-gradient(135deg, #4ecdc4 0%, #45b7aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-/* Toggle fullscreen mode on double-click of timer */
-document.getElementById('timer-display').addEventListener('dblclick', () => {
-    document.body.classList.toggle('fullscreen-mode');
-});
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
 
-/* Initial display update */
-updateDisplay();
-</script>
-</body>
-</html>
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--color-surface);
+            color: var(--color-text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            background: var(--color-surface-light);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #ff5252 0%, #ff3838 100%);
+            box-shadow: 0 12px 24px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, #45b7aa 100%);
+            border: none;
+            color: white;
+        }
+
+        .btn.secondary:hover {
+            background: linear-gradient(135deg, #45b7aa 0%, #3aa39f 100%);
+            box-shadow: 0 12px 24px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn.small {
+            padding: 8px 16px;
+            font-size: 12px;
+            flex: none;
+        }
+
+        .settings-group {
+            margin-bottom: 20px;
+        }
+
+        .settings-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .label {
+            display: block;
+            font-size: 12px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-number {
+            background: var(--color-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--color-text);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            width: 80px;
+            transition: all 0.3s ease;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .input-number:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 12px rgba(255, 107, 107, 0.2);
+            background: var(--color-surface-light);
+        }
+
+        .input-number::-webkit-outer-spin-button,
+        .input-number::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .input-number[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .slider-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--color-surface);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .volume-value {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: var(--color-surface);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--color-surface);
+            color: var(--color-text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            border-color: transparent;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-surface);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--color-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .fullscreen-btn:hover {
+            background: var(--color-surface-light);
+            transform: scale(1.1);
+        }
+
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-darker) 100%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .fullscreen-mode.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .fullscreen-content {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .fullscreen-timer {
+            font-size: 120px;
+            font-weight: 700;
+            letter-spacing: -4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fullscreen-timer.break {
+            background: linear-gradient(135deg, #4ecdc4 0%, #45b7aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fullscreen-label {
+            font-size: 24px;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .fullscreen-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .fullscreen-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--color-surface);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: var(--color-text);
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .notification.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100%;
+            }
+
+            .timer-circle {
+                width: 160px;
+                height: 160px;
+            }
+
+            .timer-value {
+                font-size: 44px;
+            }
+
+            .fullscreen-timer {
+                font-size: 80px;
+            }
+
+            .fullscreen-btn {
+                top: 16px;
+                right: 16px;
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .fullscreen-close {
+                top: 16px;
+                right: 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+
+    <script>
+        // Pomodoro Timer Application
+        const app = {
+            // State
+            state: {
+                timeLeft: 25 * 60,
+                totalTime: 25 * 60,
+                isRunning: false,
+                isBreak: false,
+                isLongBreak: false,
+                volume: 0.5,
+                sessionsCompleted: 0,
+                focusTimeToday: 0,
+                lastStatsDate: new Date().toDateString(),
+            },
+
+            // Configuration
+            config: {
+                pomodoroMinutes: 25,
+                shortBreakMinutes: 5,
+                longBreakMinutes: 15,
+                sessionsUntilLongBreak: 4,
+            },
+
+            // DOM Elements
+            elements: {},
+
+            // Timers
+            timers: {
+                countdown: null,
+                wakeLock: null,
+            },
+
+            // Audio
+            audio: {
+                bgMusic: null,
+                alarmSound: null,
+            },
+
+            // Initialize the app
+            init() {
+                this.cacheElements();
+                this.loadSettings();
+                this.setupEventListeners();
+                this.updateDisplay();
+                this.setupAudio();
+                this.requestWakeLock();
+            },
+
+            // Cache DOM elements
+            cacheElements() {
+                this.elements = {
+                    timerValue: document.getElementById('timerValue'),
+                    timerMode: document.getElementById('timerMode'),
+                    timerCircle: document.getElementById('timerCircle'),
+                    startBtn: document.getElementById('startBtn'),
+                    pauseBtn: document.getElementById('pauseBtn'),
+                    resetBtn: document.getElementById('resetBtn'),
+                    pomodoroInput: document.getElementById('pomodoroInput'),
+                    shortBreakInput: document.getElementById('shortBreakInput'),
+                    longBreakInput: document.getElementById('longBreakInput'),
+                    volumeSlider: document.getElementById('volumeSlider'),
+                    volumeValue: document.getElementById('volumeValue'),
+                    muteBtn: document.getElementById('muteBtn'),
+                    sessionsCount: document.getElementById('sessionsCount'),
+                    focusTime: document.getElementById('focusTime'),
+                    streakCount: document.getElementById('streakCount'),
+                    fullscreenBtn: document.getElementById('fullscreenBtn'),
+                    fullscreenMode: document.getElementById('fullscreenMode'),
+                    fullscreenTimer: document.getElementById('fullscreenTimer'),
+                    fullscreenLabel: document.getElementById('fullscreenLabel'),
+                    fullscreenClose: document.getElementById('fullscreenClose'),
+                    timerTab: document.getElementById('timerTab'),
+                    settingsTab: document.getElementById('settingsTab'),
+                    statsTab: document.getElementById('statsTab'),
+                    timerContent: document.getElementById('timerContent'),
+                    settingsContent: document.getElementById('settingsContent'),
+                    statsContent: document.getElementById('statsContent'),
+                };
+            },
+
+            // Load settings from localStorage
+            loadSettings() {
+                const savedSettings = localStorage.getItem('pomodoroSettings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    Object.assign(this.config, settings);
+                    Object.assign(this.state, JSON.parse(localStorage.getItem('pomodoroState') || '{}'));
+                    
+                    // Reset stats if new day
+                    const today = new Date().toDateString();
+                    if (this.state.lastStatsDate !== today) {
+                        this.state.sessionsCompleted = 0;
+                        this.state.focusTimeToday = 0;
+                        this.state.lastStatsDate = today;
+                    }
+                }
+                
+                this.state.timeLeft = this.config.pomodoroMinutes * 60;
+                this.state.totalTime = this.state.timeLeft;
+                this.updateInputs();
+            },
+
+            // Save settings to localStorage
+            saveSettings() {
+                localStorage.setItem('pomodoroSettings', JSON.stringify(this.config));
+                localStorage.setItem('pomodoroState', JSON.stringify(this.state));
+            },
+
+            // Update input values
+            updateInputs() {
+                this.elements.pomodoroInput.value = this.config.pomodoroMinutes;
+                this.elements.shortBreakInput.value = this.config.shortBreakMinutes;
+                this.elements.longBreakInput.value = this.config.longBreakMinutes;
+                this.elements.volumeSlider.value = this.state.volume * 100;
+                this.updateVolumeDisplay();
+            },
+
+            // Setup event listeners
+            setupEventListeners() {
+                this.elements.startBtn.addEventListener('click', () => this.start());
+                this.elements.pauseBtn.addEventListener('click', () => this.pause());
+                this.elements.resetBtn.addEventListener('click', () => this.reset());
+
+                this.elements.pomodoroInput.addEventListener('change', (e) => {
+                    const val = Math.max(1, Math.min(420, parseInt(e.target.value) || 25));
+                    this.config.pomodoroMinutes = val;
+                    e.target.value = val;
+                    if (!this.state.isRunning && !this.state.isBreak) {
+                        this.state.timeLeft = val * 60;
+                        this.state.totalTime = this.state.timeLeft;
+                        this.updateDisplay();
+                    }
+                    this.saveSettings();
+                });
+
+                this.elements.shortBreakInput.addEventListener('change', (e) => {
+                    const val = Math.max(1, Math.min(60, parseInt(e.target.value) || 5));
+                    this.config.shortBreakMinutes = val;
+                    e.target.value = val;
+                    this.saveSettings();
+                });
+
+                this.elements.longBreakInput.addEventListener('change', (e) => {
+                    const val = Math.max(1, Math.min(120, parseInt(e.target.value) || 15));
+                    this.config.longBreakMinutes = val;
+                    e.target.value = val;
+                    this.saveSettings();
+                });
+
+                this.elements.volumeSlider.addEventListener('input', (e) => {
+                    this.state.volume = parseInt(e.target.value) / 100;
+                    this.updateVolumeDisplay();
+                    if (this.audio.bgMusic) {
+                        this.audio.bgMusic.volume = this.state.volume;
+                    }
+                    this.saveSettings();
+                });
+
+                this.elements.muteBtn.addEventListener('click', () => {
+                    this.state.volume = this.state.volume > 0 ? 0 : 0.5;
+                    this.elements.volumeSlider.value = this.state.volume * 100;
+                    if (this.audio.bgMusic) {
+                        this.audio.bgMusic.volume = this.state.volume;
+                    }
+                    this.updateVolumeDisplay();
+                    this.saveSettings();
+                });
+
+                this.elements.fullscreenBtn.addEventListener('click', () => {
+                    this.elements.fullscreenMode.classList.add('active');
+                });
+
+                this.elements.fullscreenClose.addEventListener('click', () => {
+                    this.elements.fullscreenMode.classList.remove('active');
+                });
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.state.isRunning ? this.pause() : this.start();
+                    }
+                    if (e.code === 'KeyR') {
+                        this.reset();
+                    }
+                });
+
+                // Tab switching
+                document.getElementById('timerTab').addEventListener('click', () => this.switchTab('timer'));
+                document.getElementById('settingsTab').addEventListener('click', () => this.switchTab('settings'));
+                document.getElementById('statsTab').addEventListener('click', () => this.switchTab('stats'));
+            },
+
+            // Switch tabs
+            switchTab(tab) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                if (tab === 'timer') {
+                    this.elements.timerTab.classList.add('active');
+                    this.elements.timerContent.classList.add('active');
+                } else if (tab === 'settings') {
+                    this.elements.settingsTab.classList.add('active');
+                    this.elements.settingsContent.classList.add('active');
+                } else if (tab === 'stats') {
+                    this.elements.statsTab.classList.add('active');
+                    this.elements.statsContent.classList.add('active');
+                    this.updateStatsDisplay();
+                }
+            },
+
+            // Setup audio
+            setupAudio() {
+                // Background music using royalty-free source
+                this.audio.bgMusic = new Audio();
+                this.audio.bgMusic.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+                this.audio.bgMusic.loop = true;
+                this.audio.bgMusic.volume = this.state.volume;
+                
+                // Alarm sound - using Web Audio API to generate tone
+                this.audio.alarmSound = this.createAlarmSound();
+            },
+
+            // Create alarm sound using Web Audio API
+            createAlarmSound() {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const audioCtx = new AudioContext();
+                
+                return {
+                    play() {
+                        try {
+                            const osc = audioCtx.createOscillator();
+                            const gain = audioCtx.createGain();
+                            
+                            osc.connect(gain);
+                            gain.connect(audioCtx.destination);
+                            
+                            osc.frequency.value = 800;
+                            osc.type = 'sine';
+                            
+                            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                            
+                            osc.start(audioCtx.currentTime);
+                            osc.stop(audioCtx.currentTime + 0.5);
+                        } catch (e) {
+                            console.log('Alarm sound unavailable');
+                        }
+                    }
+                };
+            },
+
+            // Request wake lock
+            requestWakeLock() {
+                if ('wakeLock' in navigator) {
+                    navigator.wakeLock.request('screen').catch(() => {
+                        console.log('Wake lock not available');
+                    });
+                }
+            },
+
+            // Start timer
+            start() {
+                if (this.state.isRunning) return;
+                
+                this.state.isRunning = true;
+                this.elements.startBtn.style.display = 'none';
+                this.elements.pauseBtn.style.display = 'block';
+
+                // Try to play background music
+                if (this.audio.bgMusic && this.audio.bgMusic.paused) {
+                    this.audio.bgMusic.play().catch(() => {
+                        console.log('Background music autoplay blocked');
+                    });
+                }
+
+                this.timers.countdown = setInterval(() => {
+                    this.state.timeLeft--;
+                    
+                    if (this.state.timeLeft <= 0) {
+                        this.completeSession();
+                    }
+                    
+                    this.updateDisplay();
+                }, 1000);
+            },
+
+            // Pause timer
+            pause() {
+                this.state.isRunning = false;
+                this.elements.startBtn.style.display = 'block';
+                this.elements.pauseBtn.style.display = 'none';
+                clearInterval(this.timers.countdown);
+                this.updateDisplay();
+            },
+
+            // Reset timer
+            reset() {
+                this.pause();
+                this.state.isBreak = false;
+                this.state.isLongBreak = false;
+                this.state.timeLeft = this.config.pomodoroMinutes * 60;
+                this.state.totalTime = this.state.timeLeft;
+                this.updateDisplay();
+                
+                if (this.audio.bgMusic) {
+                    this.audio.bgMusic.pause();
+                    this.audio.bgMusic.currentTime = 0;
+                }
+            },
+
+            // Complete session
+            completeSession() {
+                this.pause();
+                
+                if (!this.state.isBreak) {
+                    // Focus session completed
+                    this.state.focusTimeToday += this.config.pomodoroMinutes;
+                    this.state.sessionsCompleted++;
+                    
+                    // Determine break type
+                    const isLongBreak = this.state.sessionsCompleted % this.config.sessionsUntilLongBreak === 0;
+                    
+                    this.showNotification(
+                        isLongBreak 
+                            ? 'Focus complete! Time for a long break.' 
+                            : 'Focus complete! Short break time.'
+                    );
+                    
+                    // Play alarm
+                    this.playAlarm();
+                    
+                    // Switch to break
