@@ -30,6 +30,21 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
         }
 
         .card {
@@ -91,6 +106,16 @@
             background-clip: text;
         }
 
+        .timer-value.ringing {
+            animation: ring 0.3s ease-in-out;
+        }
+
+        @keyframes ring {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
         .controls {
             display: flex;
             gap: 12px;
@@ -134,6 +159,11 @@
 
         .btn.secondary:hover {
             box-shadow: 0 12px 24px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn.small {
+            padding: 8px 16px;
+            font-size: 12px;
         }
 
         .btn:active {
@@ -213,6 +243,63 @@
             text-align: right;
         }
 
+        .sound-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .sound-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sound-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .sound-card.active {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 107, 107, 0.1) 100%);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .sound-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .sound-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .sound-preview-btn {
+            width: 100%;
+            padding: 6px 12px;
+            background: rgba(78, 205, 196, 0.2);
+            border: 1px solid #4ecdc4;
+            color: #4ecdc4;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sound-preview-btn:hover {
+            background: rgba(78, 205, 196, 0.4);
+        }
+
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -272,6 +359,33 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        .sound-status {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            margin-top: 16px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #b0b3c1;
+        }
+
+        .sound-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ecdc4;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .fullscreen-btn {
@@ -405,6 +519,10 @@
             .fullscreen-timer {
                 font-size: 80px;
             }
+
+            .sound-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -439,6 +557,10 @@
                     <button class="btn secondary" id="pauseBtn" style="display: none;">Pause</button>
                     <button class="btn" id="resetBtn">Reset</button>
                 </div>
+                <div class="sound-status">
+                    <span class="sound-indicator" id="soundIndicator"></span>
+                    <span>Background music & effects enabled</span>
+                </div>
             </div>
         </div>
 
@@ -469,12 +591,21 @@
                 </div>
 
                 <div class="settings-group">
-                    <label class="label">Volume</label>
+                    <label class="label">Master Volume</label>
                     <div class="input-group">
                         <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="50">
                         <button class="btn" id="muteBtn" style="flex: 0; padding: 8px 12px; border-radius: 8px;">🔊</button>
                         <span class="volume-value" id="volumeValue">50%</span>
                     </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="label">Background Sound</label>
+                    <div class="sound-grid" id="soundGrid"></div>
+                </div>
+
+                <div class="settings-group">
+                    <button class="btn" id="testAlarmBtn" style="width: 100%;">Test Alarm Sound</button>
                 </div>
             </div>
         </div>
@@ -507,6 +638,277 @@
     <div class="notification" id="notification"></div>
 
     <script>
+        let audioContext = null;
+
+        function getAudioContext() {
+            if (!audioContext) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioContext = new AudioContext();
+            }
+            return audioContext;
+        }
+
+        // Sound definitions
+        const SOUNDS = {
+            silence: {
+                name: 'Silence',
+                icon: '🔇',
+                generate: () => null
+            },
+            focus: {
+                name: 'Focus Ambient',
+                icon: '🎵',
+                generate: (ctx, master, vol) => {
+                    const freqs = [55, 110, 165];
+                    freqs.forEach(freq => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.value = 0.08 * vol;
+                        osc.connect(gain);
+                        gain.connect(master);
+                        osc.start();
+                        master._oscs = master._oscs || [];
+                        master._oscs.push({ osc, gain });
+                    });
+                }
+            },
+            forest: {
+                name: 'Forest',
+                icon: '🌲',
+                generate: (ctx, master, vol) => {
+                    const freqs = [49, 82, 123, 164];
+                    freqs.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.value = (0.06 * vol) / (i + 1);
+                        osc.connect(gain);
+                        gain.connect(master);
+                        osc.start();
+                        master._oscs = master._oscs || [];
+                        master._oscs.push({ osc, gain });
+                    });
+                }
+            },
+            ocean: {
+                name: 'Ocean Waves',
+                icon: '🌊',
+                generate: (ctx, master, vol) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const lfo = ctx.createOscillator();
+                    const lfoGain = ctx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.value = 40;
+                    gain.gain.value = 0.1 * vol;
+
+                    lfo.type = 'sine';
+                    lfo.frequency.value = 0.3;
+                    lfoGain.gain.value = 20;
+
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(osc.frequency);
+                    osc.connect(gain);
+                    gain.connect(master);
+
+                    osc.start();
+                    lfo.start();
+                    master._oscs = master._oscs || [];
+                    master._oscs.push({ osc, gain, lfo });
+                }
+            },
+            rain: {
+                name: 'Rainfall',
+                icon: '🌧️',
+                generate: (ctx, master, vol) => {
+                    const frequencies = [100, 150, 200, 250, 300];
+                    frequencies.forEach(freq => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = freq + Math.random() * 50;
+                        gain.gain.value = 0.05 * vol;
+                        osc.connect(gain);
+                        gain.connect(master);
+                        osc.start();
+                        master._oscs = master._oscs || [];
+                        master._oscs.push({ osc, gain });
+                    });
+                }
+            },
+            zenBells: {
+                name: 'Zen Bells',
+                icon: '🔔',
+                generate: (ctx, master, vol) => {
+                    const freqs = [330, 494, 659];
+                    let phase = 0;
+                    const interval = setInterval(() => {
+                        if (!master._oscs) return;
+                        const freq = freqs[phase % freqs.length];
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        gain.gain.setValueAtTime(0.15 * vol, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 2);
+                        osc.connect(gain);
+                        gain.connect(master);
+                        osc.start();
+                        osc.stop(ctx.currentTime + 2);
+                        phase++;
+                    }, 3000);
+                    master._soundInterval = interval;
+                }
+            },
+            lofiBeats: {
+                name: 'Lo-Fi Beats',
+                icon: '🎧',
+                generate: (ctx, master, vol) => {
+                    const freqs = [120, 180, 240];
+                    freqs.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = i === 0 ? 'sine' : 'triangle';
+                        osc.frequency.value = freq;
+                        gain.gain.value = (0.07 * vol) / (i + 1);
+                        osc.connect(gain);
+                        gain.connect(master);
+                        osc.start();
+                        master._oscs = master._oscs || [];
+                        master._oscs.push({ osc, gain });
+                    });
+                }
+            }
+        };
+
+        const audioManager = {
+            isPlaying: false,
+            currentSound: 'focus',
+            masterGain: null,
+            currentVolume: 0.5,
+
+            init() {
+                const ctx = getAudioContext();
+                this.masterGain = ctx.createGain();
+                this.masterGain.connect(ctx.destination);
+                this.masterGain.gain.value = this.currentVolume * 0.3;
+            },
+
+            setVolume(val) {
+                this.currentVolume = val;
+                if (this.masterGain) {
+                    this.masterGain.gain.value = val * 0.3;
+                }
+            },
+
+            setSound(soundKey) {
+                this.currentSound = soundKey;
+                if (this.isPlaying) {
+                    this.stop();
+                    this.start();
+                }
+            },
+
+            start() {
+                if (this.isPlaying || this.currentSound === 'silence') return;
+                this.isPlaying = true;
+
+                const ctx = getAudioContext();
+                const soundDef = SOUNDS[this.currentSound];
+                
+                if (soundDef && soundDef.generate) {
+                    soundDef.generate(ctx, this.masterGain, this.currentVolume);
+                }
+            },
+
+            stop() {
+                if (!this.masterGain._oscs) return;
+                this.masterGain._oscs.forEach(obj => {
+                    try { obj.osc.stop(); } catch (e) {}
+                });
+                if (this.masterGain._soundInterval) {
+                    clearInterval(this.masterGain._soundInterval);
+                }
+                this.masterGain._oscs = [];
+                this.isPlaying = false;
+            },
+
+            preview(soundKey, duration = 2) {
+                const ctx = getAudioContext();
+                const previewGain = ctx.createGain();
+                previewGain.connect(ctx.destination);
+                previewGain.gain.value = this.currentVolume * 0.3;
+
+                const soundDef = SOUNDS[soundKey];
+                if (soundDef && soundDef.generate && soundKey !== 'silence') {
+                    soundDef.generate(ctx, previewGain, this.currentVolume);
+                    const oscs = previewGain._oscs || [];
+                    setTimeout(() => {
+                        oscs.forEach(obj => {
+                            try { obj.osc.stop(); } catch (e) {}
+                        });
+                    }, duration * 1000);
+                }
+            },
+
+            playAlarm() {
+                const ctx = getAudioContext();
+                
+                const playBeep = (startTime, duration, freq) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    
+                    gain.gain.setValueAtTime(this.currentVolume * 0.4, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.connect(gain);
+                    gain.connect(this.masterGain);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                };
+
+                const now = ctx.currentTime;
+                playBeep(now, 0.3, 800);
+                playBeep(now + 0.4, 0.3, 800);
+                playBeep(now + 0.8, 0.5, 800);
+            },
+
+            playTick() {
+                const ctx = getAudioContext();
+                const now = ctx.currentTime;
+                
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.frequency.value = 600;
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(this.currentVolume * 0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                
+                osc.connect(gain);
+                gain.connect(this.masterGain);
+                
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+        };
+
+        document.addEventListener('click', () => {
+            if (!audioContext) {
+                getAudioContext();
+                audioManager.init();
+            }
+        });
+
         const app = {
             state: {
                 timeLeft: 1500,
@@ -518,6 +920,7 @@
                 sessionsCompleted: 0,
                 focusTimeToday: 0,
                 dayStreak: 0,
+                soundType: 'focus',
                 lastDate: new Date().toDateString()
             },
 
@@ -533,8 +936,10 @@
             init() {
                 this.loadData();
                 this.cacheDOM();
+                this.renderSoundOptions();
                 this.bindEvents();
                 this.updateDisplay();
+                audioManager.init();
             },
 
             loadData() {
@@ -559,6 +964,7 @@
 
                     this.state.timeLeft = this.config.pomodoroMinutes * 60;
                     this.state.totalTime = this.state.timeLeft;
+                    audioManager.setSound(this.state.soundType);
                 } catch (e) {
                     console.error('Load error:', e);
                 }
@@ -575,6 +981,33 @@
                 }
             },
 
+            renderSoundOptions() {
+                const grid = document.getElementById('soundGrid');
+                grid.innerHTML = '';
+
+                Object.entries(SOUNDS).forEach(([key, sound]) => {
+                    const card = document.createElement('div');
+                    card.className = 'sound-card' + (key === this.state.soundType ? ' active' : '');
+                    card.innerHTML = `
+                        <div class="sound-icon">${sound.icon}</div>
+                        <div class="sound-name">${sound.name}</div>
+                        <button class="sound-preview-btn" data-sound="${key}">Preview</button>
+                    `;
+                    card.addEventListener('click', () => this.selectSound(key));
+                    grid.appendChild(card);
+                });
+            },
+
+            selectSound(soundKey) {
+                document.querySelectorAll('.sound-card').forEach(c => c.classList.remove('active'));
+                document.querySelector(`[data-sound="${soundKey}"]`).closest('.sound-card').classList.add('active');
+                
+                this.state.soundType = soundKey;
+                audioManager.setSound(soundKey);
+                this.showNotification(`Sound changed to: ${SOUNDS[soundKey].name}`);
+                this.saveData();
+            },
+
             cacheDOM() {
                 this.dom = {
                     timerValue: document.getElementById('timerValue'),
@@ -588,6 +1021,7 @@
                     volumeSlider: document.getElementById('volumeSlider'),
                     volumeValue: document.getElementById('volumeValue'),
                     muteBtn: document.getElementById('muteBtn'),
+                    testAlarmBtn: document.getElementById('testAlarmBtn'),
                     fullscreenBtn: document.getElementById('fullscreenBtn'),
                     fullscreenMode: document.getElementById('fullscreenMode'),
                     fullscreenClose: document.getElementById('fullscreenClose'),
@@ -600,7 +1034,7 @@
                     resetStatsBtn: document.getElementById('resetStatsBtn'),
                     notification: document.getElementById('notification'),
                     tabButtons: document.querySelectorAll('.tab-btn'),
-                    tabContents: document.querySelectorAll('.tab-content')
+                    tabContents: document.querySelectorAll('.tab-content'),
                 };
 
                 this.updateInputs();
@@ -618,6 +1052,19 @@
                 this.dom.startBtn.addEventListener('click', () => this.start());
                 this.dom.pauseBtn.addEventListener('click', () => this.pause());
                 this.dom.resetBtn.addEventListener('click', () => this.reset());
+                this.dom.testAlarmBtn.addEventListener('click', () => {
+                    audioManager.playAlarm();
+                    this.showNotification('🔔 Alarm test!');
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('sound-preview-btn')) {
+                        e.stopPropagation();
+                        const soundKey = e.target.dataset.sound;
+                        audioManager.preview(soundKey, 2);
+                        this.showNotification(`Previewing: ${SOUNDS[soundKey].name}`);
+                    }
+                });
 
                 this.dom.pomodoroInput.addEventListener('change', (e) => {
                     const val = Math.max(1, Math.min(420, parseInt(e.target.value) || 25));
@@ -647,6 +1094,7 @@
 
                 this.dom.volumeSlider.addEventListener('input', (e) => {
                     this.state.volume = parseInt(e.target.value) / 100;
+                    audioManager.setVolume(this.state.volume);
                     this.dom.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
                     this.saveData();
                 });
@@ -654,6 +1102,7 @@
                 this.dom.muteBtn.addEventListener('click', () => {
                     this.state.volume = this.state.volume > 0 ? 0 : 0.5;
                     this.dom.volumeSlider.value = this.state.volume * 100;
+                    audioManager.setVolume(this.state.volume);
                     this.dom.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
                     this.dom.muteBtn.textContent = this.state.volume > 0 ? '🔊' : '🔇';
                     this.saveData();
@@ -739,8 +1188,17 @@
                 this.dom.startBtn.style.display = 'none';
                 this.dom.pauseBtn.style.display = 'block';
 
+                if (!audioManager.isPlaying && this.state.soundType !== 'silence') {
+                    audioManager.start();
+                    this.showNotification(`🎵 ${SOUNDS[this.state.soundType].name} started...`);
+                }
+
                 this.countdownInterval = setInterval(() => {
                     this.state.timeLeft--;
+
+                    if (this.state.timeLeft % 10 === 0 && this.state.timeLeft > 0) {
+                        audioManager.playTick();
+                    }
 
                     if (this.state.timeLeft <= 0) {
                         this.complete();
@@ -779,6 +1237,11 @@
                 this.dom.startBtn.style.display = 'block';
                 this.dom.pauseBtn.style.display = 'none';
 
+                audioManager.playAlarm();
+
+                this.dom.timerValue.classList.add('ringing');
+                setTimeout(() => this.dom.timerValue.classList.remove('ringing'), 600);
+
                 if (!this.state.isBreak) {
                     this.state.focusTimeToday += this.config.pomodoroMinutes;
                     this.state.sessionsCompleted++;
@@ -794,14 +1257,14 @@
                     this.state.timeLeft = breakTime * 60;
                     this.state.totalTime = this.state.timeLeft;
 
-                    const msg = isLongBreak ? 'Time for a long break!' : 'Time for a short break!';
+                    const msg = isLongBreak ? '☕ Time for a long break!' : '⏱️ Time for a short break!';
                     this.showNotification(msg);
                 } else {
                     this.state.isBreak = false;
                     this.state.isLongBreak = false;
                     this.state.timeLeft = this.config.pomodoroMinutes * 60;
                     this.state.totalTime = this.state.timeLeft;
-                    this.showNotification('Break over! Time to focus.');
+                    this.showNotification('💪 Break over! Time to focus.');
                 }
 
                 this.updateDisplay();
