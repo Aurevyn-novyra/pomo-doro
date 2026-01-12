@@ -11,31 +11,16 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --primary: #ff6b6b;
-            --secondary: #4ecdc4;
-            --accent: #ffd93d;
-            --dark: #0a0e27;
-            --darker: #050812;
-            --surface: rgba(255, 255, 255, 0.05);
-            --surface-light: rgba(255, 255, 255, 0.08);
-            --text: #ffffff;
-            --text-muted: #b0b3c1;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
-            color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            overflow: hidden;
-        }
-
         body {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #050812 100%);
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
         }
 
         .container {
@@ -48,13 +33,12 @@
         }
 
         .card {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 24px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
         }
 
         .timer-display {
@@ -63,11 +47,11 @@
         }
 
         .timer-mode {
-            font-size: 14px;
-            color: var(--text-muted);
+            font-size: 12px;
+            color: #b0b3c1;
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: 600;
         }
 
@@ -81,21 +65,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            animation: pulse 2s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.1);
+            animation: glow 2s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 107, 0.1); }
-            50% { box-shadow: 0 0 50px rgba(255, 107, 107, 0.2); }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.1); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.2); }
         }
 
         .timer-value {
             font-size: 56px;
             font-weight: 700;
             letter-spacing: -2px;
-            font-family: 'Monaco', monospace;
+            font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -126,55 +108,46 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            background: var(--surface);
-            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn:hover {
-            background: var(--surface-light);
+            background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+            border: none;
+        }
+
+        .btn.primary:hover {
+            box-shadow: 0 12px 24px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #4ecdc4 0%, #45b7aa 100%);
+            border: none;
+        }
+
+        .btn.secondary:hover {
+            box-shadow: 0 12px 24px rgba(78, 205, 196, 0.3);
         }
 
         .btn:active {
             transform: translateY(0);
         }
 
-        .btn.primary {
-            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
-            border: none;
-            color: white;
-        }
-
-        .btn.primary:hover {
-            background: linear-gradient(135deg, #ff5252 0%, #ff3838 100%);
-            box-shadow: 0 12px 24px rgba(255, 107, 107, 0.3);
-        }
-
-        .btn.secondary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #45b7aa 100%);
-            border: none;
-            color: white;
-        }
-
-        .btn.secondary:hover {
-            background: linear-gradient(135deg, #45b7aa 0%, #3aa39f 100%);
-            box-shadow: 0 12px 24px rgba(78, 205, 196, 0.3);
-        }
-
         .settings-group {
             margin-bottom: 20px;
-        }
-
-        .settings-group:last-child {
-            margin-bottom: 0;
         }
 
         .label {
             display: block;
             font-size: 12px;
-            color: var(--text-muted);
+            color: #b0b3c1;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
@@ -188,31 +161,28 @@
         }
 
         .input-number {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 10px 12px;
-            color: var(--text);
+            color: #ffffff;
             font-size: 14px;
             font-weight: 600;
             text-align: center;
             width: 80px;
-            transition: all 0.3s ease;
-            font-family: 'Monaco', monospace;
         }
 
         .input-number:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: #ff6b6b;
             box-shadow: 0 0 12px rgba(255, 107, 107, 0.2);
-            background: var(--surface-light);
         }
 
         .slider {
             flex: 1;
             height: 6px;
             border-radius: 3px;
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.1);
             outline: none;
             -webkit-appearance: none;
             cursor: pointer;
@@ -223,25 +193,23 @@
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
+            background: #ff6b6b;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         }
 
         .slider::-moz-range-thumb {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
+            background: #ff6b6b;
             cursor: pointer;
             border: none;
-            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
         }
 
         .volume-value {
             font-size: 12px;
-            color: var(--text-muted);
-            min-width: 30px;
+            color: #b0b3c1;
+            min-width: 35px;
             text-align: right;
         }
 
@@ -249,11 +217,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-top: 16px;
         }
 
         .stat-item {
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             padding: 12px;
             text-align: center;
@@ -263,13 +230,13 @@
         .stat-value {
             font-size: 20px;
             font-weight: 700;
-            color: var(--primary);
+            color: #ff6b6b;
             margin-bottom: 4px;
         }
 
         .stat-label {
             font-size: 11px;
-            color: var(--text-muted);
+            color: #b0b3c1;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -284,8 +251,8 @@
             flex: 1;
             padding: 10px 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--surface);
-            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            color: #b0b3c1;
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
@@ -294,7 +261,7 @@
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
             border-color: transparent;
             color: white;
         }
@@ -314,9 +281,9 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text);
+            color: #ffffff;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -327,7 +294,6 @@
         }
 
         .fullscreen-btn:hover {
-            background: var(--surface-light);
             transform: scale(1.1);
         }
 
@@ -337,16 +303,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            background: linear-gradient(135deg, #0a0e27 0%, #050812 100%);
             z-index: 1000;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
+            flex-direction: column;
+            gap: 40px;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
-            gap: 40px;
         }
 
         .fullscreen-mode.active {
@@ -358,7 +324,7 @@
             font-size: 120px;
             font-weight: 700;
             letter-spacing: -4px;
-            font-family: 'Monaco', monospace;
+            font-family: 'Courier New', monospace;
             background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -374,7 +340,7 @@
 
         .fullscreen-label {
             font-size: 24px;
-            color: var(--text-muted);
+            color: #b0b3c1;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -388,7 +354,7 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text);
+            color: #ffffff;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -398,7 +364,6 @@
         }
 
         .fullscreen-close:hover {
-            background: rgba(255, 255, 255, 0.2);
             transform: scale(1.1);
         }
 
@@ -407,12 +372,12 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
-            background: var(--surface);
+            background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 16px 24px;
             border-radius: 12px;
-            color: var(--text);
+            color: #ffffff;
             font-size: 14px;
             pointer-events: none;
             z-index: 999;
@@ -448,7 +413,7 @@
 
     <div class="fullscreen-mode" id="fullscreenMode">
         <button class="fullscreen-close" id="fullscreenClose">✕</button>
-        <div style="text-align: center;">
+        <div>
             <div class="fullscreen-label" id="fullscreenLabel">Focus</div>
             <div class="fullscreen-timer" id="fullscreenTimer">25:00</div>
         </div>
@@ -456,17 +421,16 @@
 
     <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" id="timerTab">Timer</button>
-            <button class="tab-btn" id="settingsTab">Settings</button>
-            <button class="tab-btn" id="statsTab">Stats</button>
+            <button class="tab-btn active" data-tab="timer">Timer</button>
+            <button class="tab-btn" data-tab="settings">Settings</button>
+            <button class="tab-btn" data-tab="stats">Stats</button>
         </div>
 
-        <!-- Timer Tab -->
-        <div class="tab-content active" id="timerContent">
+        <div class="tab-content active" id="timerTab">
             <div class="card">
                 <div class="timer-display">
                     <div class="timer-mode" id="timerMode">Focus Time</div>
-                    <div class="timer-circle" id="timerCircle">
+                    <div class="timer-circle">
                         <div class="timer-value" id="timerValue">25:00</div>
                     </div>
                 </div>
@@ -478,30 +442,29 @@
             </div>
         </div>
 
-        <!-- Settings Tab -->
-        <div class="tab-content" id="settingsContent">
+        <div class="tab-content" id="settingsTab">
             <div class="card">
                 <div class="settings-group">
-                    <label class="label">Pomodoro Duration (minutes)</label>
+                    <label class="label">Pomodoro (min)</label>
                     <div class="input-group">
                         <input type="number" class="input-number" id="pomodoroInput" min="1" max="420" value="25">
-                        <span style="color: var(--text-muted); font-size: 12px;">1 - 420</span>
+                        <span style="color: #b0b3c1; font-size: 12px;">1-420</span>
                     </div>
                 </div>
 
                 <div class="settings-group">
-                    <label class="label">Short Break (minutes)</label>
+                    <label class="label">Short Break (min)</label>
                     <div class="input-group">
                         <input type="number" class="input-number" id="shortBreakInput" min="1" max="60" value="5">
-                        <span style="color: var(--text-muted); font-size: 12px;">1 - 60</span>
+                        <span style="color: #b0b3c1; font-size: 12px;">1-60</span>
                     </div>
                 </div>
 
                 <div class="settings-group">
-                    <label class="label">Long Break (minutes)</label>
+                    <label class="label">Long Break (min)</label>
                     <div class="input-group">
                         <input type="number" class="input-number" id="longBreakInput" min="1" max="120" value="15">
-                        <span style="color: var(--text-muted); font-size: 12px;">1 - 120</span>
+                        <span style="color: #b0b3c1; font-size: 12px;">1-120</span>
                     </div>
                 </div>
 
@@ -509,20 +472,19 @@
                     <label class="label">Volume</label>
                     <div class="input-group">
                         <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="50">
-                        <button class="btn" id="muteBtn" style="flex: 0; padding: 8px 12px;">🔊</button>
+                        <button class="btn" id="muteBtn" style="flex: 0; padding: 8px 12px; border-radius: 8px;">🔊</button>
                         <span class="volume-value" id="volumeValue">50%</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Stats Tab -->
-        <div class="tab-content" id="statsContent">
+        <div class="tab-content" id="statsTab">
             <div class="card">
                 <div class="stats">
                     <div class="stat-item">
                         <div class="stat-value" id="sessionsCount">0</div>
-                        <div class="stat-label">Sessions Today</div>
+                        <div class="stat-label">Sessions</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="focusTime">0m</div>
@@ -530,10 +492,10 @@
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="streakCount">0</div>
-                        <div class="stat-label">Day Streak</div>
+                        <div class="stat-label">Streak</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value" id="avgTime">25m</div>
+                        <div class="stat-value" id="avgTime">0m</div>
                         <div class="stat-label">Avg Session</div>
                     </div>
                 </div>
@@ -547,75 +509,76 @@
     <script>
         const app = {
             state: {
-                timeLeft: 25 * 60,
-                totalTime: 25 * 60,
+                timeLeft: 1500,
+                totalTime: 1500,
                 isRunning: false,
                 isBreak: false,
                 isLongBreak: false,
                 volume: 0.5,
                 sessionsCompleted: 0,
                 focusTimeToday: 0,
-                lastStatsDate: new Date().toDateString(),
                 dayStreak: 0,
+                lastDate: new Date().toDateString()
             },
 
             config: {
                 pomodoroMinutes: 25,
                 shortBreakMinutes: 5,
                 longBreakMinutes: 15,
-                sessionsUntilLongBreak: 4,
+                sessionsUntilLongBreak: 4
             },
 
-            elements: {},
-            timers: { countdown: null },
-            isMuted: false,
+            countdownInterval: null,
 
             init() {
-                this.loadSettings();
-                this.cacheElements();
-                this.setupEventListeners();
+                this.loadData();
+                this.cacheDOM();
+                this.bindEvents();
                 this.updateDisplay();
             },
 
-            loadSettings() {
+            loadData() {
                 try {
-                    const saved = localStorage.getItem('pomodoroSettings');
+                    const saved = localStorage.getItem('pomodoroApp');
                     if (saved) {
                         const data = JSON.parse(saved);
-                        this.config = { ...this.config, ...data.config };
-                        this.state = { ...this.state, ...data.state };
+                        this.state = Object.assign(this.state, data.state);
+                        this.config = Object.assign(this.config, data.config);
                     }
 
                     const today = new Date().toDateString();
-                    if (this.state.lastStatsDate !== today) {
+                    if (this.state.lastDate !== today) {
                         this.state.sessionsCompleted = 0;
                         this.state.focusTimeToday = 0;
-                        this.state.lastStatsDate = today;
+                        this.state.lastDate = today;
+                    }
+
+                    if (this.state.isRunning) {
+                        this.state.isRunning = false;
                     }
 
                     this.state.timeLeft = this.config.pomodoroMinutes * 60;
                     this.state.totalTime = this.state.timeLeft;
                 } catch (e) {
-                    console.log('Error loading settings');
+                    console.error('Load error:', e);
                 }
             },
 
-            saveSettings() {
+            saveData() {
                 try {
-                    localStorage.setItem('pomodoroSettings', JSON.stringify({
-                        config: this.config,
+                    localStorage.setItem('pomodoroApp', JSON.stringify({
                         state: this.state,
+                        config: this.config
                     }));
                 } catch (e) {
-                    console.log('Error saving settings');
+                    console.error('Save error:', e);
                 }
             },
 
-            cacheElements() {
-                this.elements = {
+            cacheDOM() {
+                this.dom = {
                     timerValue: document.getElementById('timerValue'),
                     timerMode: document.getElementById('timerMode'),
-                    timerCircle: document.getElementById('timerCircle'),
                     startBtn: document.getElementById('startBtn'),
                     pauseBtn: document.getElementById('pauseBtn'),
                     resetBtn: document.getElementById('resetBtn'),
@@ -625,42 +588,38 @@
                     volumeSlider: document.getElementById('volumeSlider'),
                     volumeValue: document.getElementById('volumeValue'),
                     muteBtn: document.getElementById('muteBtn'),
+                    fullscreenBtn: document.getElementById('fullscreenBtn'),
+                    fullscreenMode: document.getElementById('fullscreenMode'),
+                    fullscreenClose: document.getElementById('fullscreenClose'),
+                    fullscreenTimer: document.getElementById('fullscreenTimer'),
+                    fullscreenLabel: document.getElementById('fullscreenLabel'),
                     sessionsCount: document.getElementById('sessionsCount'),
                     focusTime: document.getElementById('focusTime'),
                     streakCount: document.getElementById('streakCount'),
                     avgTime: document.getElementById('avgTime'),
-                    fullscreenBtn: document.getElementById('fullscreenBtn'),
-                    fullscreenMode: document.getElementById('fullscreenMode'),
-                    fullscreenTimer: document.getElementById('fullscreenTimer'),
-                    fullscreenLabel: document.getElementById('fullscreenLabel'),
-                    fullscreenClose: document.getElementById('fullscreenClose'),
-                    timerTab: document.getElementById('timerTab'),
-                    settingsTab: document.getElementById('settingsTab'),
-                    statsTab: document.getElementById('statsTab'),
-                    timerContent: document.getElementById('timerContent'),
-                    settingsContent: document.getElementById('settingsContent'),
-                    statsContent: document.getElementById('statsContent'),
                     resetStatsBtn: document.getElementById('resetStatsBtn'),
                     notification: document.getElementById('notification'),
+                    tabButtons: document.querySelectorAll('.tab-btn'),
+                    tabContents: document.querySelectorAll('.tab-content')
                 };
 
                 this.updateInputs();
             },
 
             updateInputs() {
-                this.elements.pomodoroInput.value = this.config.pomodoroMinutes;
-                this.elements.shortBreakInput.value = this.config.shortBreakMinutes;
-                this.elements.longBreakInput.value = this.config.longBreakMinutes;
-                this.elements.volumeSlider.value = this.state.volume * 100;
-                this.updateVolumeDisplay();
+                this.dom.pomodoroInput.value = this.config.pomodoroMinutes;
+                this.dom.shortBreakInput.value = this.config.shortBreakMinutes;
+                this.dom.longBreakInput.value = this.config.longBreakMinutes;
+                this.dom.volumeSlider.value = this.state.volume * 100;
+                this.dom.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
             },
 
-            setupEventListeners() {
-                this.elements.startBtn.addEventListener('click', () => this.start());
-                this.elements.pauseBtn.addEventListener('click', () => this.pause());
-                this.elements.resetBtn.addEventListener('click', () => this.reset());
+            bindEvents() {
+                this.dom.startBtn.addEventListener('click', () => this.start());
+                this.dom.pauseBtn.addEventListener('click', () => this.pause());
+                this.dom.resetBtn.addEventListener('click', () => this.reset());
 
-                this.elements.pomodoroInput.addEventListener('change', (e) => {
+                this.dom.pomodoroInput.addEventListener('change', (e) => {
                     const val = Math.max(1, Math.min(420, parseInt(e.target.value) || 25));
                     this.config.pomodoroMinutes = val;
                     e.target.value = val;
@@ -669,52 +628,58 @@
                         this.state.totalTime = this.state.timeLeft;
                         this.updateDisplay();
                     }
-                    this.saveSettings();
+                    this.saveData();
                 });
 
-                this.elements.shortBreakInput.addEventListener('change', (e) => {
+                this.dom.shortBreakInput.addEventListener('change', (e) => {
                     const val = Math.max(1, Math.min(60, parseInt(e.target.value) || 5));
                     this.config.shortBreakMinutes = val;
                     e.target.value = val;
-                    this.saveSettings();
+                    this.saveData();
                 });
 
-                this.elements.longBreakInput.addEventListener('change', (e) => {
+                this.dom.longBreakInput.addEventListener('change', (e) => {
                     const val = Math.max(1, Math.min(120, parseInt(e.target.value) || 15));
                     this.config.longBreakMinutes = val;
                     e.target.value = val;
-                    this.saveSettings();
+                    this.saveData();
                 });
 
-                this.elements.volumeSlider.addEventListener('input', (e) => {
+                this.dom.volumeSlider.addEventListener('input', (e) => {
                     this.state.volume = parseInt(e.target.value) / 100;
-                    this.updateVolumeDisplay();
-                    this.saveSettings();
+                    this.dom.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
+                    this.saveData();
                 });
 
-                this.elements.muteBtn.addEventListener('click', () => {
-                    this.isMuted = !this.isMuted;
-                    this.elements.muteBtn.textContent = this.isMuted ? '🔇' : '🔊';
+                this.dom.muteBtn.addEventListener('click', () => {
+                    this.state.volume = this.state.volume > 0 ? 0 : 0.5;
+                    this.dom.volumeSlider.value = this.state.volume * 100;
+                    this.dom.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
+                    this.dom.muteBtn.textContent = this.state.volume > 0 ? '🔊' : '🔇';
+                    this.saveData();
                 });
 
-                this.elements.fullscreenBtn.addEventListener('click', () => {
-                    this.elements.fullscreenMode.classList.add('active');
+                this.dom.fullscreenBtn.addEventListener('click', () => {
+                    this.dom.fullscreenMode.classList.add('active');
                 });
 
-                this.elements.fullscreenClose.addEventListener('click', () => {
-                    this.elements.fullscreenMode.classList.remove('active');
+                this.dom.fullscreenClose.addEventListener('click', () => {
+                    this.dom.fullscreenMode.classList.remove('active');
                 });
 
-                this.elements.timerTab.addEventListener('click', () => this.switchTab('timer'));
-                this.elements.settingsTab.addEventListener('click', () => this.switchTab('settings'));
-                this.elements.statsTab.addEventListener('click', () => this.switchTab('stats'));
+                this.dom.tabButtons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
 
-                this.elements.resetStatsBtn.addEventListener('click', () => {
+                this.dom.resetStatsBtn.addEventListener('click', () => {
                     this.state.sessionsCompleted = 0;
                     this.state.focusTimeToday = 0;
                     this.state.dayStreak = 0;
-                    this.saveSettings();
-                    this.updateStatsDisplay();
+                    this.saveData();
+                    this.updateStats();
                     this.showNotification('Stats reset!');
                 });
 
@@ -729,101 +694,143 @@
                 });
             },
 
-            switchTab(tab) {
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            switchTab(tabName) {
+                this.dom.tabContents.forEach(content => content.classList.remove('active'));
+                this.dom.tabButtons.forEach(btn => btn.classList.remove('active'));
 
-                if (tab === 'timer') {
-                    this.elements.timerTab.classList.add('active');
-                    this.elements.timerContent.classList.add('active');
-                } else if (tab === 'settings') {
-                    this.elements.settingsTab.classList.add('active');
-                    this.elements.settingsContent.classList.add('active');
-                } else if (tab === 'stats') {
-                    this.elements.statsTab.classList.add('active');
-                    this.elements.statsContent.classList.add('active');
-                    this.updateStatsDisplay();
+                document.getElementById(tabName + 'Tab').classList.add('active');
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+                if (tabName === 'stats') {
+                    this.updateStats();
                 }
-            },
-
-            updateVolumeDisplay() {
-                this.elements.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
-            },
-
-            updateStatsDisplay() {
-                this.elements.sessionsCount.textContent = this.state.sessionsCompleted;
-                const minutes = this.state.focusTimeToday;
-                this.elements.focusTime.textContent = minutes > 0 ? minutes + 'm' : '0m';
-                this.elements.streakCount.textContent = this.state.dayStreak;
-                const avgSession = this.state.sessionsCompleted > 0 
-                    ? Math.round(this.state.focusTimeToday / this.state.sessionsCompleted) 
-                    : this.config.pomodoroMinutes;
-                this.elements.avgTime.textContent = avgSession + 'm';
             },
 
             updateDisplay() {
                 const mins = Math.floor(this.state.timeLeft / 60);
                 const secs = this.state.timeLeft % 60;
-                const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+                const timeStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
 
-                this.elements.timerValue.textContent = timeStr;
-                this.elements.fullscreenTimer.textContent = timeStr;
+                this.dom.timerValue.textContent = timeStr;
+                this.dom.fullscreenTimer.textContent = timeStr;
 
-                const label = this.state.isBreak 
+                const modeText = this.state.isBreak
                     ? (this.state.isLongBreak ? 'Long Break' : 'Short Break')
                     : 'Focus Time';
-                this.elements.timerMode.textContent = label;
-                this.elements.fullscreenLabel.textContent = label;
+
+                this.dom.timerMode.textContent = modeText;
+                this.dom.fullscreenLabel.textContent = modeText;
 
                 if (this.state.isBreak) {
-                    this.elements.timerValue.classList.add('break');
-                    this.elements.fullscreenTimer.classList.add('break');
+                    this.dom.timerValue.classList.add('break');
+                    this.dom.fullscreenTimer.classList.add('break');
                 } else {
-                    this.elements.timerValue.classList.remove('break');
-                    this.elements.fullscreenTimer.classList.remove('break');
+                    this.dom.timerValue.classList.remove('break');
+                    this.dom.fullscreenTimer.classList.remove('break');
                 }
 
-                document.title = `${timeStr} - Pomodoro Timer`;
+                document.title = timeStr + ' - Pomodoro';
             },
 
             start() {
                 if (this.state.isRunning) return;
 
                 this.state.isRunning = true;
-                this.elements.startBtn.style.display = 'none';
-                this.elements.pauseBtn.style.display = 'block';
+                this.dom.startBtn.style.display = 'none';
+                this.dom.pauseBtn.style.display = 'block';
 
-                this.timers.countdown = setInterval(() => {
+                this.countdownInterval = setInterval(() => {
                     this.state.timeLeft--;
 
                     if (this.state.timeLeft <= 0) {
-                        this.completeSession();
+                        this.complete();
                     }
 
                     this.updateDisplay();
                 }, 1000);
+
+                this.saveData();
             },
 
             pause() {
                 this.state.isRunning = false;
-                this.elements.startBtn.style.display = 'block';
-                this.elements.pauseBtn.style.display = 'none';
-                clearInterval(this.timers.countdown);
+                this.dom.startBtn.style.display = 'block';
+                this.dom.pauseBtn.style.display = 'none';
+                clearInterval(this.countdownInterval);
+                this.saveData();
             },
 
             reset() {
-                this.pause();
+                clearInterval(this.countdownInterval);
+                this.state.isRunning = false;
                 this.state.isBreak = false;
                 this.state.isLongBreak = false;
                 this.state.timeLeft = this.config.pomodoroMinutes * 60;
                 this.state.totalTime = this.state.timeLeft;
+                this.dom.startBtn.style.display = 'block';
+                this.dom.pauseBtn.style.display = 'none';
                 this.updateDisplay();
+                this.saveData();
             },
 
-            completeSession() {
-                this.pause();
+            complete() {
+                clearInterval(this.countdownInterval);
+                this.state.isRunning = false;
+                this.dom.startBtn.style.display = 'block';
+                this.dom.pauseBtn.style.display = 'none';
 
                 if (!this.state.isBreak) {
                     this.state.focusTimeToday += this.config.pomodoroMinutes;
                     this.state.sessionsCompleted++;
-                    const
+
+                    const isLongBreak = this.state.sessionsCompleted % this.config.sessionsUntilLongBreak === 0;
+                    this.state.isLongBreak = isLongBreak;
+                    this.state.isBreak = true;
+
+                    const breakTime = isLongBreak 
+                        ? this.config.longBreakMinutes 
+                        : this.config.shortBreakMinutes;
+
+                    this.state.timeLeft = breakTime * 60;
+                    this.state.totalTime = this.state.timeLeft;
+
+                    const msg = isLongBreak ? 'Time for a long break!' : 'Time for a short break!';
+                    this.showNotification(msg);
+                } else {
+                    this.state.isBreak = false;
+                    this.state.isLongBreak = false;
+                    this.state.timeLeft = this.config.pomodoroMinutes * 60;
+                    this.state.totalTime = this.state.timeLeft;
+                    this.showNotification('Break over! Time to focus.');
+                }
+
+                this.updateDisplay();
+                this.saveData();
+            },
+
+            updateStats() {
+                this.dom.sessionsCount.textContent = this.state.sessionsCompleted;
+                this.dom.focusTime.textContent = this.state.focusTimeToday + 'm';
+                this.dom.streakCount.textContent = this.state.dayStreak;
+
+                const avg = this.state.sessionsCompleted > 0
+                    ? Math.round(this.state.focusTimeToday / this.state.sessionsCompleted)
+                    : this.config.pomodoroMinutes;
+                this.dom.avgTime.textContent = avg + 'm';
+            },
+
+            showNotification(msg) {
+                this.dom.notification.textContent = msg;
+                this.dom.notification.classList.add('show');
+                setTimeout(() => {
+                    this.dom.notification.classList.remove('show');
+                }, 3000);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
