@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Pomodoro Timer</title>
+<style>
+:root {
+    --primary-color: rgba(255, 255, 255, 0.15);
+    --secondary-color: rgba(255, 255, 255, 0.05);
+    --accent-color: #ff6b6b;
+    --text-color: #ffffff;
+    --bg-color: #0f0f0f;
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --transition-speed: 0.3s;
+    --blur-strength: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-family);
+    background: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: inherit;
+    font: inherit;
+}
+
+input, select {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.app-container {
+    backdrop-filter: blur(var(--blur-strength));
+    background: var(--primary-color);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px var(--secondary-color);
+    padding: 40px;
+    max-width: 400px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all var(--transition-speed) ease;
+}
+
+.timer-display {
+    font-size: 4rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    user-select: none;
+}
+
+.session-type {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--accent-color);
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+button.control-btn {
+    padding: 12px 20px;
+    border-radius: 12px;
+    background: var(--accent-color);
+    color: var(--text-color);
+    font-weight: bold;
+    transition: background var(--transition-speed);
+}
+
+button.control-btn:hover {
+    background: #ff5252;
+}
+
+.settings-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.settings-panel input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--secondary-color);
+    text-align: center;
+}
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+button.control-btn:active {
+    animation: pulse 0.2s ease-in-out;
+}
+
+.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+body.fullscreen-mode {
+    background: #000;
+}
+
+body.fullscreen-mode .app-container {
+    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    justify-content: center;
+}
+
+</style>
+<body>
+<div class="app-container fade-in">
+    <div class="session-type" id="session-type">Pomodoro</div>
+    <div class="timer-display" id="timer-display">25:00</div>
+    <div class="controls">
+        <button class="control-btn" id="start-btn">Start</button>
+        <button class="control-btn" id="pause-btn">Pause</button>
+        <button class="control-btn" id="reset-btn">Reset</button>
+    </div>
+    <div class="settings-panel">
+        <label>Pomodoro (minutes):
+            <input type="number" id="pomodoro-duration" min="1" max="420" value="25">
+        </label>
+        <label>Short Break (minutes):
+            <input type="number" id="short-break-duration" min="1" max="60" value="5">
+        </label>
+        <label>Long Break (minutes):
+            <input type="number" id="long-break-duration" min="1" max="60" value="15">
+        </label>
+        <label>Sessions before Long Break:
+            <input type="number" id="sessions-before-long-break" min="1" max="10" value="4">
+        </label>
+        <label>Volume:
+            <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5">
+        </label>
+        <label>
+            <input type="checkbox" id="mute-toggle"> Mute
+        </label>
+    </div>
+</div>
+<script>
+let pomodoroDuration = parseInt(localStorage.getItem('pomodoroDuration')) || 25;
+let shortBreakDuration = parseInt(localStorage.getItem('shortBreakDuration')) || 5;
+let longBreakDuration = parseInt(localStorage.getItem('longBreakDuration')) || 15;
+let sessionsBeforeLongBreak = parseInt(localStorage.getItem('sessionsBeforeLongBreak')) || 4;
+
+let sessionType = 'Pomodoro';
+let sessionCount = 0;
+let timer = null;
+let remainingTime = pomodoroDuration * 60;
+
+const timerDisplay = document.getElementById('timer-display');
+const sessionTypeDisplay = document.getElementById('session-type');
+
+function formatTime(seconds) {
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${mins}:${secs}`;
+}
+
+function updateDisplay() {
+    timerDisplay.textContent = formatTime(remainingTime);
+    sessionTypeDisplay.textContent = sessionType;
+}
+
+function startTimer() {
+    if (!timer) {
+        timer = setInterval(() => {
+            if (remainingTime > 0) {
+                remainingTime--;
+                updateDisplay();
+            } else {
+                clearInterval(timer);
+                timer = null;
+                handleSessionEnd();
+            }
+        }, 1000);
+    }
+}
+
+function pauseTimer() {
+    if (timer) {
+        clearInterval(timer);
+        timer = null;
+    }
+}
+
+function resetTimer() {
+    pauseTimer();
+    if (sessionType === 'Pomodoro') {
+        remainingTime = pomodoroDuration * 60;
+    } else if (sessionType === 'Short Break') {
+        remainingTime = shortBreakDuration * 60;
+    } else {
+        remainingTime = longBreakDuration * 60;
+    }
+    updateDisplay();
+}
+
+function handleSessionEnd() {
+    if (sessionType === 'Pomodoro') {
+        sessionCount++;
+        if (sessionCount % sessionsBeforeLongBreak === 0) {
+            sessionType = 'Long Break';
+            remainingTime = longBreakDuration * 60;
+        } else {
+            sessionType = 'Short Break';
+            remainingTime = shortBreakDuration * 60;
+        }
+    } else {
+        sessionType = 'Pomodoro';
+        remainingTime = pomodoroDuration * 60;
+    }
+    updateDisplay();
+    startTimer();
+}
+updateDisplay();
+const startBtn = document.getElementById('start-btn');
+const pauseBtn = document.getElementById('pause-btn');
+const resetBtn = document.getElementById('reset-btn');
+
+const pomodoroInput = document.getElementById('pomodoro-duration');
+const shortBreakInput = document.getElementById('short-break-duration');
+const longBreakInput = document.getElementById('long-break-duration');
+const sessionsInput = document.getElementById('sessions-before-long-break');
+
+startBtn.addEventListener('click', startTimer);
+pauseBtn.addEventListener('click', pauseTimer);
+resetBtn.addEventListener('click', resetTimer);
+
+pomodoroInput.addEventListener('change', () => {
+    pomodoroDuration = Math.max(1, Math.min(420, parseInt(pomodoroInput.value)));
+    localStorage.setItem('pomodoroDuration', pomodoroDuration);
+    if (sessionType === 'Pomodoro') resetTimer();
+});
+
+shortBreakInput.addEventListener('change', () => {
+    shortBreakDuration = Math.max(1, Math.min(60, parseInt(shortBreakInput.value)));
+    localStorage.setItem('shortBreakDuration', shortBreakDuration);
+    if (sessionType === 'Short Break') resetTimer();
+});
+
+longBreakInput.addEventListener('change', () => {
+    longBreakDuration = Math.max(1, Math.min(60, parseInt(longBreakInput.value)));
+    localStorage.setItem('longBreakDuration', longBreakDuration);
+    if (sessionType === 'Long Break') resetTimer();
+});
+
+sessionsInput.addEventListener('change', () => {
+    sessionsBeforeLongBreak = Math.max(1, Math.min(10, parseInt(sessionsInput.value)));
+    localStorage.setItem('sessionsBeforeLongBreak', sessionsBeforeLongBreak);
+});
+const volumeControl = document.getElementById('volume-control');
+const muteToggle = document.getElementById('mute-toggle');
+
+const alarmAudio = new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3');
+alarmAudio.loop = false;
+
+const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+bgMusic.loop = true;
+bgMusic.volume = parseFloat(volumeControl.value);
+bgMusic.play().catch(()=>{});
+
+volumeControl.addEventListener('input', () => {
+    bgMusic.volume = parseFloat(volumeControl.value);
+});
+
+muteToggle.addEventListener('change', () => {
+    bgMusic.muted = muteToggle.checked;
+});
+
+function handleSessionEnd() {
+    if (sessionType === 'Pomodoro') {
+        sessionCount++;
+        if (sessionCount % sessionsBeforeLongBreak === 0) {
+            sessionType = 'Long Break';
+            remainingTime = longBreakDuration * 60;
+        } else {
+            sessionType = 'Short Break';
+            remainingTime = shortBreakDuration * 60;
+        }
+    } else {
+        sessionType = 'Pomodoro';
+        remainingTime = pomodoroDuration * 60;
+    }
+    updateDisplay();
+    alarmAudio.currentTime = 0;
+    alarmAudio.play();
+    startTimer();
+}
+let streak = parseInt(localStorage.getItem('streak')) || 0;
+let dailyFocus = parseInt(localStorage.getItem('dailyFocus')) || 0;
+
+function updateStats() {
+    localStorage.setItem('streak', streak);
+    localStorage.setItem('dailyFocus', dailyFocus);
+}
+
+function handleSessionEnd() {
+    if (sessionType === 'Pomodoro') {
+        sessionCount++;
+        dailyFocus += pomodoroDuration;
+        streak++;
+        if (sessionCount % sessionsBeforeLongBreak === 0) {
+            sessionType = 'Long Break';
+            remainingTime = longBreakDuration * 60;
+        } else {
+            sessionType = 'Short Break';
+            remainingTime = shortBreakDuration * 60;
+        }
+    } else {
+        sessionType = 'Pomodoro';
+        remainingTime = pomodoroDuration * 60;
+    }
+    updateStats();
+    updateDisplay();
+    alarmAudio.currentTime = 0;
+    alarmAudio.play();
+    startTimer();
+}
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+        e.preventDefault();
+        if (timer) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
+    }
+});
+
+function updatePageTitle() {
+    if (timer) {
+        document.title = `${formatTime(remainingTime)} - ${sessionType}`;
+    } else {
+        document.title = `Pomodoro Timer`;
+    }
+}
+
+setInterval(updatePageTitle, 1000);
+
+document.getElementById('timer-display').addEventListener('dblclick', () => {
+    document.body.classList.toggle('fullscreen-mode');
+});
+</script>
+</body>
+</html>
