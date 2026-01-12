@@ -12,26 +12,23 @@
         }
 
         :root {
-            --color-primary: #ff6b6b;
-            --color-secondary: #4ecdc4;
-            --color-accent: #ffd93d;
-            --color-dark: #0a0e27;
-            --color-darker: #050812;
-            --color-surface: rgba(255, 255, 255, 0.05);
-            --color-surface-light: rgba(255, 255, 255, 0.08);
-            --color-text: #ffffff;
-            --color-text-muted: #b0b3c1;
-            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.2);
-            --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.3);
+            --primary: #ff6b6b;
+            --secondary: #4ecdc4;
+            --accent: #ffd93d;
+            --dark: #0a0e27;
+            --darker: #050812;
+            --surface: rgba(255, 255, 255, 0.05);
+            --surface-light: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --text-muted: #b0b3c1;
         }
 
         html, body {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-darker) 100%);
-            color: var(--color-text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             overflow: hidden;
         }
 
@@ -39,7 +36,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            perspective: 1000px;
         }
 
         .container {
@@ -52,28 +48,23 @@
         }
 
         .card {
-            background: var(--color-surface);
+            background: var(--surface);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
             padding: 24px;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .card:hover {
-            background: var(--color-surface-light);
-            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
         }
 
         .timer-display {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         .timer-mode {
             font-size: 14px;
-            color: var(--color-text-muted);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 10px;
@@ -83,33 +74,28 @@
         .timer-circle {
             width: 200px;
             height: 200px;
-            margin: 0 auto;
+            margin: 0 auto 20px;
             background: linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(78, 205, 196, 0.1) 100%);
             border: 2px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
             position: relative;
             animation: pulse 2s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(255, 107, 107, 0.1), inset 0 0 30px rgba(78, 205, 196, 0.05);
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.1);
         }
 
         @keyframes pulse {
-            0%, 100% {
-                box-shadow: 0 0 30px rgba(255, 107, 107, 0.1), inset 0 0 30px rgba(78, 205, 196, 0.05);
-            }
-            50% {
-                box-shadow: 0 0 50px rgba(255, 107, 107, 0.2), inset 0 0 50px rgba(78, 205, 196, 0.1);
-            }
+            0%, 100% { box-shadow: 0 0 30px rgba(255, 107, 107, 0.1); }
+            50% { box-shadow: 0 0 50px rgba(255, 107, 107, 0.2); }
         }
 
         .timer-value {
             font-size: 56px;
             font-weight: 700;
             letter-spacing: -2px;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', monospace;
             background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -137,34 +123,16 @@
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            background: var(--color-surface);
-            color: var(--color-text);
+            background: var(--surface);
+            color: var(--text);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover::before {
-            left: 100%;
         }
 
         .btn:hover {
-            background: var(--color-surface-light);
-            border-color: rgba(255, 255, 255, 0.2);
+            background: var(--surface-light);
             transform: translateY(-2px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
         }
@@ -174,7 +142,7 @@
         }
 
         .btn.primary {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
             border: none;
             color: white;
         }
@@ -185,7 +153,7 @@
         }
 
         .btn.secondary {
-            background: linear-gradient(135deg, var(--color-secondary) 0%, #45b7aa 100%);
+            background: linear-gradient(135deg, var(--secondary) 0%, #45b7aa 100%);
             border: none;
             color: white;
         }
@@ -193,12 +161,6 @@
         .btn.secondary:hover {
             background: linear-gradient(135deg, #45b7aa 0%, #3aa39f 100%);
             box-shadow: 0 12px 24px rgba(78, 205, 196, 0.3);
-        }
-
-        .btn.small {
-            padding: 8px 16px;
-            font-size: 12px;
-            flex: none;
         }
 
         .settings-group {
@@ -212,7 +174,7 @@
         .label {
             display: block;
             font-size: 12px;
-            color: var(--color-text-muted);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
@@ -226,87 +188,59 @@
         }
 
         .input-number {
-            background: var(--color-surface);
+            background: var(--surface);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 10px 12px;
-            color: var(--color-text);
+            color: var(--text);
             font-size: 14px;
             font-weight: 600;
             text-align: center;
             width: 80px;
             transition: all 0.3s ease;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', monospace;
         }
 
         .input-number:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: var(--primary);
             box-shadow: 0 0 12px rgba(255, 107, 107, 0.2);
-            background: var(--color-surface-light);
-        }
-
-        .input-number::-webkit-outer-spin-button,
-        .input-number::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        .input-number[type=number] {
-            -moz-appearance: textfield;
-        }
-
-        .slider-container {
-            display: flex;
-            gap: 12px;
-            align-items: center;
+            background: var(--surface-light);
         }
 
         .slider {
             flex: 1;
             height: 6px;
             border-radius: 3px;
-            background: var(--color-surface);
+            background: var(--surface);
             outline: none;
             -webkit-appearance: none;
-            appearance: none;
             cursor: pointer;
         }
 
         .slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
             cursor: pointer;
-            transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
         }
 
         .slider::-moz-range-thumb {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
             cursor: pointer;
             border: none;
-            transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
-        }
-
-        .slider::-moz-range-thumb:hover {
-            transform: scale(1.2);
         }
 
         .volume-value {
             font-size: 12px;
-            color: var(--color-text-muted);
+            color: var(--text-muted);
             min-width: 30px;
             text-align: right;
         }
@@ -319,7 +253,7 @@
         }
 
         .stat-item {
-            background: var(--color-surface);
+            background: var(--surface);
             border-radius: 8px;
             padding: 12px;
             text-align: center;
@@ -329,13 +263,13 @@
         .stat-value {
             font-size: 20px;
             font-weight: 700;
-            color: var(--color-primary);
+            color: var(--primary);
             margin-bottom: 4px;
         }
 
         .stat-label {
             font-size: 11px;
-            color: var(--color-text-muted);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -350,8 +284,8 @@
             flex: 1;
             padding: 10px 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            background: var(--color-surface);
-            color: var(--color-text-muted);
+            background: var(--surface);
+            color: var(--text-muted);
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
@@ -360,7 +294,7 @@
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, var(--color-primary) 0%, #ff5252 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, #ff5252 100%);
             border-color: transparent;
             color: white;
         }
@@ -380,9 +314,9 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--color-surface);
+            background: var(--surface);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--color-text);
+            color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -393,7 +327,7 @@
         }
 
         .fullscreen-btn:hover {
-            background: var(--color-surface-light);
+            background: var(--surface-light);
             transform: scale(1.1);
         }
 
@@ -403,14 +337,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-darker) 100%);
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
             z-index: 1000;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
+            gap: 40px;
         }
 
         .fullscreen-mode.active {
@@ -418,19 +354,11 @@
             pointer-events: auto;
         }
 
-        .fullscreen-content {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-        }
-
         .fullscreen-timer {
             font-size: 120px;
             font-weight: 700;
             letter-spacing: -4px;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Monaco', monospace;
             background: linear-gradient(135deg, #ff6b6b 0%, #ffd93d 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -446,7 +374,7 @@
 
         .fullscreen-label {
             font-size: 24px;
-            color: var(--color-text-muted);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -460,7 +388,7 @@
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--color-text);
+            color: var(--text);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -479,16 +407,16 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
-            background: var(--color-surface);
+            background: var(--surface);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             padding: 16px 24px;
             border-radius: 12px;
-            color: var(--color-text);
+            color: var(--text);
             font-size: 14px;
             pointer-events: none;
             z-index: 999;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
 
         .notification.show {
@@ -512,34 +440,112 @@
             .fullscreen-timer {
                 font-size: 80px;
             }
-
-            .fullscreen-btn {
-                top: 16px;
-                right: 16px;
-                width: 36px;
-                height: 36px;
-                font-size: 16px;
-            }
-
-            .fullscreen-close {
-                top: 16px;
-                right: 16px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
         }
     </style>
+</head>
+<body>
+    <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+
+    <div class="fullscreen-mode" id="fullscreenMode">
+        <button class="fullscreen-close" id="fullscreenClose">✕</button>
+        <div style="text-align: center;">
+            <div class="fullscreen-label" id="fullscreenLabel">Focus</div>
+            <div class="fullscreen-timer" id="fullscreenTimer">25:00</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" id="timerTab">Timer</button>
+            <button class="tab-btn" id="settingsTab">Settings</button>
+            <button class="tab-btn" id="statsTab">Stats</button>
+        </div>
+
+        <!-- Timer Tab -->
+        <div class="tab-content active" id="timerContent">
+            <div class="card">
+                <div class="timer-display">
+                    <div class="timer-mode" id="timerMode">Focus Time</div>
+                    <div class="timer-circle" id="timerCircle">
+                        <div class="timer-value" id="timerValue">25:00</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn primary" id="startBtn">Start</button>
+                    <button class="btn secondary" id="pauseBtn" style="display: none;">Pause</button>
+                    <button class="btn" id="resetBtn">Reset</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settingsContent">
+            <div class="card">
+                <div class="settings-group">
+                    <label class="label">Pomodoro Duration (minutes)</label>
+                    <div class="input-group">
+                        <input type="number" class="input-number" id="pomodoroInput" min="1" max="420" value="25">
+                        <span style="color: var(--text-muted); font-size: 12px;">1 - 420</span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="label">Short Break (minutes)</label>
+                    <div class="input-group">
+                        <input type="number" class="input-number" id="shortBreakInput" min="1" max="60" value="5">
+                        <span style="color: var(--text-muted); font-size: 12px;">1 - 60</span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="label">Long Break (minutes)</label>
+                    <div class="input-group">
+                        <input type="number" class="input-number" id="longBreakInput" min="1" max="120" value="15">
+                        <span style="color: var(--text-muted); font-size: 12px;">1 - 120</span>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label class="label">Volume</label>
+                    <div class="input-group">
+                        <input type="range" class="slider" id="volumeSlider" min="0" max="100" value="50">
+                        <button class="btn" id="muteBtn" style="flex: 0; padding: 8px 12px;">🔊</button>
+                        <span class="volume-value" id="volumeValue">50%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Tab -->
+        <div class="tab-content" id="statsContent">
+            <div class="card">
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="sessionsCount">0</div>
+                        <div class="stat-label">Sessions Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="focusTime">0m</div>
+                        <div class="stat-label">Focus Time</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="streakCount">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgTime">25m</div>
+                        <div class="stat-label">Avg Session</div>
+                    </div>
+                </div>
+                <button class="btn" id="resetStatsBtn" style="width: 100%; margin-top: 16px;">Reset Stats</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
 
     <script>
-        // Pomodoro Timer Application
         const app = {
-            // State
             state: {
                 timeLeft: 25 * 60,
                 totalTime: 25 * 60,
@@ -550,9 +556,9 @@
                 sessionsCompleted: 0,
                 focusTimeToday: 0,
                 lastStatsDate: new Date().toDateString(),
+                dayStreak: 0,
             },
 
-            // Configuration
             config: {
                 pomodoroMinutes: 25,
                 shortBreakMinutes: 5,
@@ -560,32 +566,51 @@
                 sessionsUntilLongBreak: 4,
             },
 
-            // DOM Elements
             elements: {},
+            timers: { countdown: null },
+            isMuted: false,
 
-            // Timers
-            timers: {
-                countdown: null,
-                wakeLock: null,
-            },
-
-            // Audio
-            audio: {
-                bgMusic: null,
-                alarmSound: null,
-            },
-
-            // Initialize the app
             init() {
-                this.cacheElements();
                 this.loadSettings();
+                this.cacheElements();
                 this.setupEventListeners();
                 this.updateDisplay();
-                this.setupAudio();
-                this.requestWakeLock();
             },
 
-            // Cache DOM elements
+            loadSettings() {
+                try {
+                    const saved = localStorage.getItem('pomodoroSettings');
+                    if (saved) {
+                        const data = JSON.parse(saved);
+                        this.config = { ...this.config, ...data.config };
+                        this.state = { ...this.state, ...data.state };
+                    }
+
+                    const today = new Date().toDateString();
+                    if (this.state.lastStatsDate !== today) {
+                        this.state.sessionsCompleted = 0;
+                        this.state.focusTimeToday = 0;
+                        this.state.lastStatsDate = today;
+                    }
+
+                    this.state.timeLeft = this.config.pomodoroMinutes * 60;
+                    this.state.totalTime = this.state.timeLeft;
+                } catch (e) {
+                    console.log('Error loading settings');
+                }
+            },
+
+            saveSettings() {
+                try {
+                    localStorage.setItem('pomodoroSettings', JSON.stringify({
+                        config: this.config,
+                        state: this.state,
+                    }));
+                } catch (e) {
+                    console.log('Error saving settings');
+                }
+            },
+
             cacheElements() {
                 this.elements = {
                     timerValue: document.getElementById('timerValue'),
@@ -603,6 +628,7 @@
                     sessionsCount: document.getElementById('sessionsCount'),
                     focusTime: document.getElementById('focusTime'),
                     streakCount: document.getElementById('streakCount'),
+                    avgTime: document.getElementById('avgTime'),
                     fullscreenBtn: document.getElementById('fullscreenBtn'),
                     fullscreenMode: document.getElementById('fullscreenMode'),
                     fullscreenTimer: document.getElementById('fullscreenTimer'),
@@ -614,38 +640,13 @@
                     timerContent: document.getElementById('timerContent'),
                     settingsContent: document.getElementById('settingsContent'),
                     statsContent: document.getElementById('statsContent'),
+                    resetStatsBtn: document.getElementById('resetStatsBtn'),
+                    notification: document.getElementById('notification'),
                 };
-            },
 
-            // Load settings from localStorage
-            loadSettings() {
-                const savedSettings = localStorage.getItem('pomodoroSettings');
-                if (savedSettings) {
-                    const settings = JSON.parse(savedSettings);
-                    Object.assign(this.config, settings);
-                    Object.assign(this.state, JSON.parse(localStorage.getItem('pomodoroState') || '{}'));
-                    
-                    // Reset stats if new day
-                    const today = new Date().toDateString();
-                    if (this.state.lastStatsDate !== today) {
-                        this.state.sessionsCompleted = 0;
-                        this.state.focusTimeToday = 0;
-                        this.state.lastStatsDate = today;
-                    }
-                }
-                
-                this.state.timeLeft = this.config.pomodoroMinutes * 60;
-                this.state.totalTime = this.state.timeLeft;
                 this.updateInputs();
             },
 
-            // Save settings to localStorage
-            saveSettings() {
-                localStorage.setItem('pomodoroSettings', JSON.stringify(this.config));
-                localStorage.setItem('pomodoroState', JSON.stringify(this.state));
-            },
-
-            // Update input values
             updateInputs() {
                 this.elements.pomodoroInput.value = this.config.pomodoroMinutes;
                 this.elements.shortBreakInput.value = this.config.shortBreakMinutes;
@@ -654,7 +655,6 @@
                 this.updateVolumeDisplay();
             },
 
-            // Setup event listeners
             setupEventListeners() {
                 this.elements.startBtn.addEventListener('click', () => this.start());
                 this.elements.pauseBtn.addEventListener('click', () => this.pause());
@@ -689,20 +689,12 @@
                 this.elements.volumeSlider.addEventListener('input', (e) => {
                     this.state.volume = parseInt(e.target.value) / 100;
                     this.updateVolumeDisplay();
-                    if (this.audio.bgMusic) {
-                        this.audio.bgMusic.volume = this.state.volume;
-                    }
                     this.saveSettings();
                 });
 
                 this.elements.muteBtn.addEventListener('click', () => {
-                    this.state.volume = this.state.volume > 0 ? 0 : 0.5;
-                    this.elements.volumeSlider.value = this.state.volume * 100;
-                    if (this.audio.bgMusic) {
-                        this.audio.bgMusic.volume = this.state.volume;
-                    }
-                    this.updateVolumeDisplay();
-                    this.saveSettings();
+                    this.isMuted = !this.isMuted;
+                    this.elements.muteBtn.textContent = this.isMuted ? '🔇' : '🔊';
                 });
 
                 this.elements.fullscreenBtn.addEventListener('click', () => {
@@ -711,6 +703,19 @@
 
                 this.elements.fullscreenClose.addEventListener('click', () => {
                     this.elements.fullscreenMode.classList.remove('active');
+                });
+
+                this.elements.timerTab.addEventListener('click', () => this.switchTab('timer'));
+                this.elements.settingsTab.addEventListener('click', () => this.switchTab('settings'));
+                this.elements.statsTab.addEventListener('click', () => this.switchTab('stats'));
+
+                this.elements.resetStatsBtn.addEventListener('click', () => {
+                    this.state.sessionsCompleted = 0;
+                    this.state.focusTimeToday = 0;
+                    this.state.dayStreak = 0;
+                    this.saveSettings();
+                    this.updateStatsDisplay();
+                    this.showNotification('Stats reset!');
                 });
 
                 document.addEventListener('keydown', (e) => {
@@ -722,18 +727,12 @@
                         this.reset();
                     }
                 });
-
-                // Tab switching
-                document.getElementById('timerTab').addEventListener('click', () => this.switchTab('timer'));
-                document.getElementById('settingsTab').addEventListener('click', () => this.switchTab('settings'));
-                document.getElementById('statsTab').addEventListener('click', () => this.switchTab('stats'));
             },
 
-            // Switch tabs
             switchTab(tab) {
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-                
+
                 if (tab === 'timer') {
                     this.elements.timerTab.classList.add('active');
                     this.elements.timerContent.classList.add('active');
@@ -747,92 +746,71 @@
                 }
             },
 
-            // Setup audio
-            setupAudio() {
-                // Background music using royalty-free source
-                this.audio.bgMusic = new Audio();
-                this.audio.bgMusic.src = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
-                this.audio.bgMusic.loop = true;
-                this.audio.bgMusic.volume = this.state.volume;
-                
-                // Alarm sound - using Web Audio API to generate tone
-                this.audio.alarmSound = this.createAlarmSound();
+            updateVolumeDisplay() {
+                this.elements.volumeValue.textContent = Math.round(this.state.volume * 100) + '%';
             },
 
-            // Create alarm sound using Web Audio API
-            createAlarmSound() {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                const audioCtx = new AudioContext();
-                
-                return {
-                    play() {
-                        try {
-                            const osc = audioCtx.createOscillator();
-                            const gain = audioCtx.createGain();
-                            
-                            osc.connect(gain);
-                            gain.connect(audioCtx.destination);
-                            
-                            osc.frequency.value = 800;
-                            osc.type = 'sine';
-                            
-                            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-                            
-                            osc.start(audioCtx.currentTime);
-                            osc.stop(audioCtx.currentTime + 0.5);
-                        } catch (e) {
-                            console.log('Alarm sound unavailable');
-                        }
-                    }
-                };
+            updateStatsDisplay() {
+                this.elements.sessionsCount.textContent = this.state.sessionsCompleted;
+                const minutes = this.state.focusTimeToday;
+                this.elements.focusTime.textContent = minutes > 0 ? minutes + 'm' : '0m';
+                this.elements.streakCount.textContent = this.state.dayStreak;
+                const avgSession = this.state.sessionsCompleted > 0 
+                    ? Math.round(this.state.focusTimeToday / this.state.sessionsCompleted) 
+                    : this.config.pomodoroMinutes;
+                this.elements.avgTime.textContent = avgSession + 'm';
             },
 
-            // Request wake lock
-            requestWakeLock() {
-                if ('wakeLock' in navigator) {
-                    navigator.wakeLock.request('screen').catch(() => {
-                        console.log('Wake lock not available');
-                    });
+            updateDisplay() {
+                const mins = Math.floor(this.state.timeLeft / 60);
+                const secs = this.state.timeLeft % 60;
+                const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+                this.elements.timerValue.textContent = timeStr;
+                this.elements.fullscreenTimer.textContent = timeStr;
+
+                const label = this.state.isBreak 
+                    ? (this.state.isLongBreak ? 'Long Break' : 'Short Break')
+                    : 'Focus Time';
+                this.elements.timerMode.textContent = label;
+                this.elements.fullscreenLabel.textContent = label;
+
+                if (this.state.isBreak) {
+                    this.elements.timerValue.classList.add('break');
+                    this.elements.fullscreenTimer.classList.add('break');
+                } else {
+                    this.elements.timerValue.classList.remove('break');
+                    this.elements.fullscreenTimer.classList.remove('break');
                 }
+
+                document.title = `${timeStr} - Pomodoro Timer`;
             },
 
-            // Start timer
             start() {
                 if (this.state.isRunning) return;
-                
+
                 this.state.isRunning = true;
                 this.elements.startBtn.style.display = 'none';
                 this.elements.pauseBtn.style.display = 'block';
 
-                // Try to play background music
-                if (this.audio.bgMusic && this.audio.bgMusic.paused) {
-                    this.audio.bgMusic.play().catch(() => {
-                        console.log('Background music autoplay blocked');
-                    });
-                }
-
                 this.timers.countdown = setInterval(() => {
                     this.state.timeLeft--;
-                    
+
                     if (this.state.timeLeft <= 0) {
                         this.completeSession();
                     }
-                    
+
                     this.updateDisplay();
                 }, 1000);
             },
 
-            // Pause timer
             pause() {
                 this.state.isRunning = false;
                 this.elements.startBtn.style.display = 'block';
                 this.elements.pauseBtn.style.display = 'none';
                 clearInterval(this.timers.countdown);
-                this.updateDisplay();
             },
 
-            // Reset timer
             reset() {
                 this.pause();
                 this.state.isBreak = false;
@@ -840,32 +818,12 @@
                 this.state.timeLeft = this.config.pomodoroMinutes * 60;
                 this.state.totalTime = this.state.timeLeft;
                 this.updateDisplay();
-                
-                if (this.audio.bgMusic) {
-                    this.audio.bgMusic.pause();
-                    this.audio.bgMusic.currentTime = 0;
-                }
             },
 
-            // Complete session
             completeSession() {
                 this.pause();
-                
+
                 if (!this.state.isBreak) {
-                    // Focus session completed
                     this.state.focusTimeToday += this.config.pomodoroMinutes;
                     this.state.sessionsCompleted++;
-                    
-                    // Determine break type
-                    const isLongBreak = this.state.sessionsCompleted % this.config.sessionsUntilLongBreak === 0;
-                    
-                    this.showNotification(
-                        isLongBreak 
-                            ? 'Focus complete! Time for a long break.' 
-                            : 'Focus complete! Short break time.'
-                    );
-                    
-                    // Play alarm
-                    this.playAlarm();
-                    
-                    // Switch to break
+                    const
