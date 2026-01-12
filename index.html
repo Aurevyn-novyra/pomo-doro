@@ -119,6 +119,12 @@ button.control-btn:hover {
     background: var(--secondary-color);
     text-align: center;
 }
+
+input:focus, button:focus {
+    outline: 2px solid rgba(255,255,255,0.12);
+    outline-offset: 2px;
+}
+
 @keyframes pulse {
     0% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.05); opacity: 0.8; }
@@ -151,41 +157,50 @@ body.fullscreen-mode .app-container {
 }
 
 </style>
+</head>
 <body>
 <div class="app-container fade-in">
     <div class="session-type" id="session-type">Pomodoro</div>
-    <div class="timer-display" id="timer-display">25:00</div>
+    <div class="timer-display" id="timer-display" role="status" aria-live="polite">25:00</div>
     <div class="controls">
-        <button class="control-btn" id="start-btn">Start</button>
-        <button class="control-btn" id="pause-btn">Pause</button>
-        <button class="control-btn" id="reset-btn">Reset</button>
+        <button class="control-btn" id="start-btn" aria-label="Start timer">Start</button>
+        <button class="control-btn" id="pause-btn" aria-label="Pause timer">Pause</button>
+        <button class="control-btn" id="reset-btn" aria-label="Reset timer">Reset</button>
     </div>
     <div class="settings-panel">
         <label>Pomodoro (minutes):
-            <input type="number" id="pomodoro-duration" min="1" max="420" value="25">
+            <input type="number" id="pomodoro-duration" min="1" max="420" value="25" aria-label="Pomodoro duration in minutes">
         </label>
         <label>Short Break (minutes):
-            <input type="number" id="short-break-duration" min="1" max="60" value="5">
+            <input type="number" id="short-break-duration" min="1" max="60" value="5" aria-label="Short break duration in minutes">
         </label>
         <label>Long Break (minutes):
-            <input type="number" id="long-break-duration" min="1" max="60" value="15">
+            <input type="number" id="long-break-duration" min="1" max="60" value="15" aria-label="Long break duration in minutes">
         </label>
         <label>Sessions before Long Break:
-            <input type="number" id="sessions-before-long-break" min="1" max="10" value="4">
+            <input type="number" id="sessions-before-long-break" min="1" max="10" value="4" aria-label="Sessions before a long break">
         </label>
         <label>Volume:
-            <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5">
+            <input type="range" id="volume-control" min="0" max="1" step="0.01" value="0.5" aria-label="Background music volume">
         </label>
         <label>
-            <input type="checkbox" id="mute-toggle"> Mute
+            <input type="checkbox" id="mute-toggle" aria-label="Mute background audio"> Mute
         </label>
     </div>
 </div>
 <script>
-let pomodoroDuration = parseInt(localStorage.getItem('pomodoroDuration')) || 25;
-let shortBreakDuration = parseInt(localStorage.getItem('shortBreakDuration')) || 5;
-let longBreakDuration = parseInt(localStorage.getItem('longBreakDuration')) || 15;
-let sessionsBeforeLongBreak = parseInt(localStorage.getItem('sessionsBeforeLongBreak')) || 4;
+/* Load persisted settings (defensive parsing) */
+let storedPomodoro = parseInt(localStorage.getItem('pomodoroDuration'));
+let storedShortBreak = parseInt(localStorage.getItem('shortBreakDuration'));
+let storedLongBreak = parseInt(localStorage.getItem('longBreakDuration'));
+let storedSessionsBeforeLong = parseInt(localStorage.getItem('sessionsBeforeLongBreak'));
+let storedVolume = parseFloat(localStorage.getItem('volume'));
+let storedMuted = (localStorage.getItem('muted') === 'true');
+
+let pomodoroDuration = Number.isInteger(storedPomodoro) ? storedPomodoro : 25;
+let shortBreakDuration = Number.isInteger(storedShortBreak) ? storedShortBreak : 5;
+let longBreakDuration = Number.isInteger(storedLongBreak) ? storedLongBreak : 15;
+let sessionsBeforeLongBreak = Number.isInteger(storedSessionsBeforeLong) ? storedSessionsBeforeLong : 4;
 
 let sessionType = 'Pomodoro';
 let sessionCount = 0;
@@ -240,24 +255,14 @@ function resetTimer() {
     updateDisplay();
 }
 
-function handleSessionEnd() {
-    if (sessionType === 'Pomodoro') {
-        sessionCount++;
-        if (sessionCount % sessionsBeforeLongBreak === 0) {
-            sessionType = 'Long Break';
-            remainingTime = longBreakDuration * 60;
-        } else {
-            sessionType = 'Short Break';
-            remainingTime = shortBreakDuration * 60;
-        }
-    } else {
-        sessionType = 'Pomodoro';
-        remainingTime = pomodoroDuration * 60;
-    }
-    updateDisplay();
-    startTimer();
-}
-updateDisplay();
+/* Audio elements */
+const alarmAudio = new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3');
+alarmAudio.loop = false;
+
+const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+bgMusic.loop = true;
+
+/* DOM elements */
 const startBtn = document.getElementById('start-btn');
 const pauseBtn = document.getElementById('pause-btn');
 const resetBtn = document.getElementById('reset-btn');
@@ -267,70 +272,78 @@ const shortBreakInput = document.getElementById('short-break-duration');
 const longBreakInput = document.getElementById('long-break-duration');
 const sessionsInput = document.getElementById('sessions-before-long-break');
 
+const volumeControl = document.getElementById('volume-control');
+const muteToggle = document.getElementById('mute-toggle');
+
+/* Initialize inputs from stored values so UI matches persisted settings */
+pomodoroInput.value = pomodoroDuration;
+shortBreakInput.value = shortBreakDuration;
+longBreakInput.value = longBreakDuration;
+sessionsInput.value = sessionsBeforeLongBreak;
+
+/* Initialize volume/mute from storage */
+if (!Number.isFinite(storedVolume)) {
+    storedVolume = parseFloat(volumeControl.value) || 0.5;
+}
+bgMusic.volume = Math.min(1, Math.max(0, storedVolume));
+volumeControl.value = bgMusic.volume;
+
+bgMusic.muted = !!storedMuted;
+muteToggle.checked = !!storedMuted;
+
+/* Try to start background music (many browsers may block autoplay) */
+bgMusic.play().catch(()=>{/* Autoplay blocked; it's fine */});
+
+/* Event listeners for controls */
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
 
+/* Persist changes when user updates settings and adjust timer if needed */
 pomodoroInput.addEventListener('change', () => {
-    pomodoroDuration = Math.max(1, Math.min(420, parseInt(pomodoroInput.value)));
+    const val = Math.max(1, Math.min(420, parseInt(pomodoroInput.value) || 25));
+    pomodoroDuration = val;
     localStorage.setItem('pomodoroDuration', pomodoroDuration);
+    pomodoroInput.value = pomodoroDuration;
     if (sessionType === 'Pomodoro') resetTimer();
 });
 
 shortBreakInput.addEventListener('change', () => {
-    shortBreakDuration = Math.max(1, Math.min(60, parseInt(shortBreakInput.value)));
+    const val = Math.max(1, Math.min(60, parseInt(shortBreakInput.value) || 5));
+    shortBreakDuration = val;
     localStorage.setItem('shortBreakDuration', shortBreakDuration);
+    shortBreakInput.value = shortBreakDuration;
     if (sessionType === 'Short Break') resetTimer();
 });
 
 longBreakInput.addEventListener('change', () => {
-    longBreakDuration = Math.max(1, Math.min(60, parseInt(longBreakInput.value)));
+    const val = Math.max(1, Math.min(60, parseInt(longBreakInput.value) || 15));
+    longBreakDuration = val;
     localStorage.setItem('longBreakDuration', longBreakDuration);
+    longBreakInput.value = longBreakDuration;
     if (sessionType === 'Long Break') resetTimer();
 });
 
 sessionsInput.addEventListener('change', () => {
-    sessionsBeforeLongBreak = Math.max(1, Math.min(10, parseInt(sessionsInput.value)));
+    const val = Math.max(1, Math.min(10, parseInt(sessionsInput.value) || 4));
+    sessionsBeforeLongBreak = val;
     localStorage.setItem('sessionsBeforeLongBreak', sessionsBeforeLongBreak);
+    sessionsInput.value = sessionsBeforeLongBreak;
 });
-const volumeControl = document.getElementById('volume-control');
-const muteToggle = document.getElementById('mute-toggle');
 
-const alarmAudio = new Audio('https://www.soundjay.com/buttons/sounds/beep-07.mp3');
-alarmAudio.loop = false;
-
-const bgMusic = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
-bgMusic.loop = true;
-bgMusic.volume = parseFloat(volumeControl.value);
-bgMusic.play().catch(()=>{});
-
+/* Volume and mute */
 volumeControl.addEventListener('input', () => {
-    bgMusic.volume = parseFloat(volumeControl.value);
+    const vol = Math.min(1, Math.max(0, parseFloat(volumeControl.value) || 0));
+    bgMusic.volume = vol;
+    localStorage.setItem('volume', vol);
 });
 
 muteToggle.addEventListener('change', () => {
     bgMusic.muted = muteToggle.checked;
+    localStorage.setItem('muted', bgMusic.muted ? 'true' : 'false');
 });
 
-function handleSessionEnd() {
-    if (sessionType === 'Pomodoro') {
-        sessionCount++;
-        if (sessionCount % sessionsBeforeLongBreak === 0) {
-            sessionType = 'Long Break';
-            remainingTime = longBreakDuration * 60;
-        } else {
-            sessionType = 'Short Break';
-            remainingTime = shortBreakDuration * 60;
-        }
-    } else {
-        sessionType = 'Pomodoro';
-        remainingTime = pomodoroDuration * 60;
-    }
-    updateDisplay();
-    alarmAudio.currentTime = 0;
-    alarmAudio.play();
-    startTimer();
-}
+/* Stats */
 let streak = parseInt(localStorage.getItem('streak')) || 0;
 let dailyFocus = parseInt(localStorage.getItem('dailyFocus')) || 0;
 
@@ -339,9 +352,11 @@ function updateStats() {
     localStorage.setItem('dailyFocus', dailyFocus);
 }
 
+/* Consolidated session end handler (single implementation) */
 function handleSessionEnd() {
     if (sessionType === 'Pomodoro') {
         sessionCount++;
+        // Keep dailyFocus in minutes
         dailyFocus += pomodoroDuration;
         streak++;
         if (sessionCount % sessionsBeforeLongBreak === 0) {
@@ -355,14 +370,27 @@ function handleSessionEnd() {
         sessionType = 'Pomodoro';
         remainingTime = pomodoroDuration * 60;
     }
+
     updateStats();
     updateDisplay();
-    alarmAudio.currentTime = 0;
-    alarmAudio.play();
+
+    // Play alarm (safe play)
+    try {
+        alarmAudio.currentTime = 0;
+        alarmAudio.play().catch(()=>{});
+    } catch (e) { /* ignore play errors */ }
+
+    // Automatically resume next session
     startTimer();
 }
+
+/* Keyboard shortcut: space toggles start/pause */
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
+        // If an input or button is focused, don't intercept
+        const active = document.activeElement;
+        const isInput = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+        if (isInput) return;
         e.preventDefault();
         if (timer) {
             pauseTimer();
@@ -372,6 +400,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+/* Update document title to show remaining time while running */
 function updatePageTitle() {
     if (timer) {
         document.title = `${formatTime(remainingTime)} - ${sessionType}`;
@@ -379,12 +408,16 @@ function updatePageTitle() {
         document.title = `Pomodoro Timer`;
     }
 }
-
+updatePageTitle();
 setInterval(updatePageTitle, 1000);
 
+/* Toggle fullscreen mode on double-click of timer */
 document.getElementById('timer-display').addEventListener('dblclick', () => {
     document.body.classList.toggle('fullscreen-mode');
 });
+
+/* Initial display update */
+updateDisplay();
 </script>
 </body>
 </html>
